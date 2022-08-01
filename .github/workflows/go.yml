@@ -1,0 +1,51 @@
+name: Go
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - uses: actions/cache@v2
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Get dependencies
+      run: |
+        # go get -v -t -d ./...
+        mkdir -p /home/runner/go/src/github.com/akiomik/get-old-tweets/
+        cp -R . /home/runner/go/src/github.com/akiomik/get-old-tweets/
+        if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+        fi
+
+    - name: Build
+      run: make build
+
+    - name: Test
+      run: make test
+
+    - name: Run staticcheck
+      uses: dominikh/staticcheck-action@v1.2.0
+      with:
+        version: "2022.1.1"
+        install-go: false
