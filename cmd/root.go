@@ -19,11 +19,12 @@ import (
 	"os"
 
 	"github.com/akiomik/get-old-tweets/config"
+	"github.com/akiomik/get-old-tweets/twitter"
 	"github.com/spf13/cobra"
 )
 
 var (
-	text string
+	text      string
 	userAgent string
 )
 
@@ -32,7 +33,16 @@ var rootCmd = &cobra.Command{
 	Short:   "get-old-tweets " + config.Version,
 	Version: config.Version,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Hello, " + text)
+		client := twitter.NewClient()
+		json, err := client.Search(text)
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			os.Exit(1)
+		}
+
+		for _, tweet := range json.GlobalObjects.Tweets {
+			fmt.Printf("%+v\n", tweet)
+		}
 	},
 }
 
