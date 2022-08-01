@@ -34,6 +34,10 @@ var rootCmd = &cobra.Command{
 	Version: config.Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		client := twitter.NewClient()
+		if len(userAgent) > 0 {
+			client.UserAgent = userAgent
+		}
+
 		json, err := client.Search(text)
 		if err != nil {
 			fmt.Println("Error:", err.Error())
