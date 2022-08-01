@@ -52,6 +52,12 @@ type GlobalObjects struct {
 	Users  map[string]User  `json:"users"`
 }
 
+type Error struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
 type AdaptiveJson struct {
 	GlobalObjects GlobalObjects `json:"globalObjects"`
+	Errors        []Error       `json:"errors"`
 }

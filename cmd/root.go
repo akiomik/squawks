@@ -40,6 +40,13 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		if len(json.Errors) != 0 {
+			for _, err := range json.Errors {
+				fmt.Printf("%d: %s\n", err.Code, err.Message)
+			}
+			os.Exit(1)
+		}
+
 		for _, tweet := range json.GlobalObjects.Tweets {
 			fmt.Printf("%+v\n", tweet)
 		}
