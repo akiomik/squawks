@@ -43,7 +43,7 @@ func (c *Client) get(url *url.URL) (*http.Response, error) {
 	}
 	req.Header.Set("User-Agent", c.UserAgent)
 	req.Header.Set("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA")
-	req.Header.Set("x-guest-token", "1554100359735685121")
+	req.Header.Set("x-guest-token", "1554145683879641089")
 
 	res, err := c.Client.Do(req)
 	if err != nil {
@@ -53,10 +53,10 @@ func (c *Client) get(url *url.URL) (*http.Response, error) {
 	return res, nil
 }
 
-func (c *Client) Search(text string) (*AdaptiveJson, error) {
+func (c *Client) Search(q Query) (*AdaptiveJson, error) {
 	url, _ := url.Parse(
 		"https://twitter.com/i/api/2/search/adaptive.json" +
-			"?q=" + url.QueryEscape(text) +
+			"?q=" + q.Encode() +
 			"&include_quote_count=true" +
 			"&include_reply_count=1" +
 			"&tweet_mode=extended" +

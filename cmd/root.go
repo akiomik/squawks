@@ -25,6 +25,8 @@ import (
 
 var (
 	text      string
+	since     string
+	until     string
 	userAgent string
 )
 
@@ -33,12 +35,18 @@ var rootCmd = &cobra.Command{
 	Short:   "get-old-tweets " + config.Version,
 	Version: config.Version,
 	Run: func(cmd *cobra.Command, args []string) {
+		query := twitter.Query{
+			Text:  text,
+			Since: since,
+			Until: until,
+		}
+
 		client := twitter.NewClient()
 		if len(userAgent) > 0 {
 			client.UserAgent = userAgent
 		}
 
-		json, err := client.Search(text)
+		json, err := client.Search(query)
 		if err != nil {
 			fmt.Println("Error:", err.Error())
 			os.Exit(1)
@@ -59,6 +67,8 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.Flags().StringVarP(&text, "text", "t", "", "query text to be matched")
+	rootCmd.Flags().StringVarP(&since, "since", "", "", "lower bound date to restrict search")
+	rootCmd.Flags().StringVarP(&until, "until", "", "", "upper bound date to restrict search")
 	rootCmd.Flags().StringVarP(&userAgent, "user-agent", "", "", "user-agent for request")
 }
 
