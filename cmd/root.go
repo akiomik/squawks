@@ -27,6 +27,8 @@ var (
 	text      string
 	since     string
 	until     string
+	from      string
+	to        string
 	userAgent string
 )
 
@@ -39,6 +41,8 @@ var rootCmd = &cobra.Command{
 			Text:  text,
 			Since: since,
 			Until: until,
+			From:  from,
+			To:    to,
 		}
 		if query.IsEmpty() {
 			fmt.Println("One or more queries are required")
@@ -64,6 +68,8 @@ func init() {
 	rootCmd.Flags().StringVarP(&text, "text", "t", "", "query text to be matched")
 	rootCmd.Flags().StringVarP(&since, "since", "", "", "lower bound date to restrict search")
 	rootCmd.Flags().StringVarP(&until, "until", "", "", "upper bound date to restrict search")
+	rootCmd.Flags().StringVarP(&from, "from", "", "", "username from a twitter account")
+	rootCmd.Flags().StringVarP(&to, "to", "", "", "username to a twitter account")
 	rootCmd.Flags().StringVarP(&userAgent, "user-agent", "", "", "user-agent for request")
 }
 

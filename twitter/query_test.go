@@ -23,19 +23,25 @@ func TestEncode(t *testing.T) {
 		text     string
 		since    string
 		until    string
+		from     string
+		to       string
 		expected string
 	}{
 		"none": {
 			text:     "",
 			since:    "",
 			until:    "",
+			from:     "",
+			to:       "",
 			expected: "",
 		},
 		"all": {
 			text:     "foo bar",
 			since:    "2020-09-06",
 			until:    "2020-09-07",
-			expected: "foo+bar+since:2020-09-06+until:2020-09-07",
+			from:     "foo",
+			to:       "bar",
+			expected: "foo+bar+since%3A2020-09-06+until%3A2020-09-07+from%3Afoo+to%3Abar",
 		},
 	}
 
@@ -45,6 +51,8 @@ func TestEncode(t *testing.T) {
 				Text:  e.text,
 				Since: e.since,
 				Until: e.until,
+				From:  e.from,
+				To:    e.to,
 			}
 
 			actual := q.Encode()
@@ -62,18 +70,24 @@ func TestIsEmpty(t *testing.T) {
 		text     string
 		since    string
 		until    string
+		from     string
+		to       string
 		expected bool
 	}{
 		"none": {
 			text:     "",
 			since:    "",
 			until:    "",
+			from:     "",
+			to:       "",
 			expected: true,
 		},
 		"all": {
 			text:     "foo bar",
 			since:    "2020-09-06",
 			until:    "2020-09-07",
+			from:     "foo",
+			to:       "bar",
 			expected: false,
 		},
 	}

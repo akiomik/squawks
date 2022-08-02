@@ -23,13 +23,15 @@ type Query struct {
 	Text  string
 	Since string
 	Until string
+	From  string
+	To    string
 }
 
 func (q *Query) Encode() string {
 	var ss []string
 
 	if len(q.Text) != 0 {
-		ss = append(ss, url.QueryEscape(q.Text))
+		ss = append(ss, q.Text)
 	}
 
 	if len(q.Since) != 0 {
@@ -40,8 +42,15 @@ func (q *Query) Encode() string {
 		ss = append(ss, "until:"+q.Until)
 	}
 
-	res := strings.Join(ss[:], url.QueryEscape(" "))
-	return res
+	if len(q.From) != 0 {
+		ss = append(ss, "from:"+q.From)
+	}
+
+	if len(q.To) != 0 {
+		ss = append(ss, "to:"+q.To)
+	}
+
+	return url.QueryEscape(strings.Join(ss[:], " "))
 }
 
 func (q *Query) IsEmpty() bool {
