@@ -126,11 +126,11 @@ func (j *AdaptiveJson) FindCursor() (string, error) {
 		if i.ReplaceEntry.EntryIdToReplace == "sq-cursor-bottom" {
 			return i.ReplaceEntry.Entry.Content.Operation.Cursor.Value, nil
 		}
-	}
 
-	for _, e := range j.Timeline.Instructions[0].AddEntries.Entries {
-		if e.EntryId == "sq-cursor-bottom" {
-			return e.Content.Operation.Cursor.Value, nil
+		for _, e := range i.AddEntries.Entries {
+			if e.EntryId == "sq-cursor-bottom" {
+				return e.Content.Operation.Cursor.Value, nil
+			}
 		}
 	}
 
