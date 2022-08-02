@@ -65,7 +65,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.Flags().StringVarP(&text, "text", "t", "", "query text to be matched")
+	rootCmd.Flags().StringVarP(&text, "query", "q", "", "query text to be matched")
 	rootCmd.Flags().StringVarP(&since, "since", "", "", "lower bound date to restrict search")
 	rootCmd.Flags().StringVarP(&until, "until", "", "", "upper bound date to restrict search")
 	rootCmd.Flags().StringVarP(&from, "from", "", "", "username from a twitter account")
