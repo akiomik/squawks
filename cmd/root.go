@@ -34,7 +34,7 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:     "get-old-tweets",
-	Short:   "get-old-tweets " + config.Version,
+	Short:   "get-old-tweets v" + config.Version,
 	Version: config.Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		query := twitter.Query{
