@@ -40,6 +40,10 @@ var rootCmd = &cobra.Command{
 			Since: since,
 			Until: until,
 		}
+		if query.IsEmpty() {
+			fmt.Println("One or more queries are required")
+			os.Exit(1)
+		}
 
 		client := twitter.NewClient()
 		if len(userAgent) > 0 {

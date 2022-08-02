@@ -43,3 +43,7 @@ func (q *Query) Encode() string {
 	res := strings.Join(ss[:], url.QueryEscape(" "))
 	return res
 }
+
+func (q *Query) IsEmpty() bool {
+	return len(q.Encode()) == 0
+}
