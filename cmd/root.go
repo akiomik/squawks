@@ -19,11 +19,13 @@ import (
 	"os"
 
 	"github.com/akiomik/get-old-tweets/config"
+	"github.com/akiomik/get-old-tweets/export"
 	"github.com/akiomik/get-old-tweets/twitter"
 	"github.com/spf13/cobra"
 )
 
 var (
+	out       string
 	text      string
 	since     string
 	until     string
@@ -37,40 +39,46 @@ var rootCmd = &cobra.Command{
 	Short:   "get-old-tweets v" + config.Version,
 	Version: config.Version,
 	Run: func(cmd *cobra.Command, args []string) {
-		query := twitter.Query{
+		q := twitter.Query{
 			Text:  text,
 			Since: since,
 			Until: until,
 			From:  from,
 			To:    to,
 		}
-		if query.IsEmpty() {
+		if q.IsEmpty() {
 			fmt.Fprintln(os.Stderr, "Error: One or more queries are required")
 			os.Exit(1)
 		}
+
+		f, err := os.OpenFile(out, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		defer f.Close()
 
 		client := twitter.NewClient()
 		if len(userAgent) > 0 {
 			client.UserAgent = userAgent
 		}
 
-		ch := client.SearchAll(query)
+		input := client.SearchAll(q)
+		done := export.ExportCsv(f, input)
 
-		for json := range ch {
-			for _, tweet := range json.GlobalObjects.Tweets {
-				fmt.Printf("%+v\n", tweet)
-			}
-		}
+		<-done
 	},
 }
 
 func init() {
+	rootCmd.Flags().StringVarP(&out, "out", "o", "", "output csv filename")
 	rootCmd.Flags().StringVarP(&text, "query", "q", "", "query text to be matched")
 	rootCmd.Flags().StringVarP(&since, "since", "", "", "lower bound date to restrict search")
 	rootCmd.Flags().StringVarP(&until, "until", "", "", "upper bound date to restrict search")
 	rootCmd.Flags().StringVarP(&from, "from", "", "", "username from a twitter account")
 	rootCmd.Flags().StringVarP(&to, "to", "", "", "username to a twitter account")
 	rootCmd.Flags().StringVarP(&userAgent, "user-agent", "", "", "user-agent for request")
+	rootCmd.MarkFlagRequired("out")
 }
 
 func Execute() {

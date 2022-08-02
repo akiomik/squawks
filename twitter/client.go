@@ -45,7 +45,7 @@ func (c *Client) get(url *url.URL) (*http.Response, error) {
 	}
 	req.Header.Set("User-Agent", c.UserAgent)
 	req.Header.Set("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA")
-	req.Header.Set("x-guest-token", "1554370317552091136")
+	req.Header.Set("x-guest-token", "1554560694741520384")
 
 	res, err := c.Client.Do(req)
 	if err != nil {
