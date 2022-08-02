@@ -45,7 +45,7 @@ var rootCmd = &cobra.Command{
 			To:    to,
 		}
 		if query.IsEmpty() {
-			fmt.Println("One or more queries are required")
+			fmt.Fprintln(os.Stderr, "Error: One or more queries are required")
 			os.Exit(1)
 		}
 
@@ -75,7 +75,7 @@ func init() {
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println("Error:", err.Error())
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err.Error())
 		os.Exit(1)
 	}
 }

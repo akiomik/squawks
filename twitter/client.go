@@ -20,6 +20,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 
 	"github.com/akiomik/get-old-tweets/config"
 )
@@ -109,6 +110,7 @@ func (c *Client) SearchAll(q Query) <-chan *AdaptiveJson {
 		for {
 			adaptiveJson, err := c.Search(q, cursor)
 			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 				panic(err)
 			}
 
@@ -119,6 +121,7 @@ func (c *Client) SearchAll(q Query) <-chan *AdaptiveJson {
 
 			cursor, err = adaptiveJson.FindCursor()
 			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 				panic(err)
 			}
 		}
