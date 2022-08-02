@@ -14,6 +14,26 @@
 
 package twitter
 
+import (
+	"fmt"
+)
+
+type BoundingBox struct {
+	Type       string        `json:"type"`
+	Coodinates [][][]float64 `json:"coordinates"`
+}
+
+type Place struct {
+	Id          string      `json:"id"`
+	Url         string      `json:"url"`
+	PlaceType   string      `json:"place_type"`
+	Name        string      `json:"name"`
+	FullName    string      `json:"full_name"`
+	CountryCode string      `json:"country_code"`
+	Country     string      `json:"country"`
+	BoundingBox BoundingBox `json:"bounding_box"`
+}
+
 type Tweet struct {
 	Id            int64    `json:"id"`
 	UserId        int64    `json:"user_id"`
@@ -24,7 +44,7 @@ type Tweet struct {
 	QuoteCount    int64    `json:"quote_count"`
 	Geo           string   `json:"geo"`
 	Coodinates    string   `json:"coordinates"`
-	Place         string   `json:"place"`
+	Place         Place    `json:"place"`
 	Lang          string   `json:"lang"`
 	Source        string   `json:"source"`
 	CreatedAt     RubyDate `json:"created_at"`
@@ -52,6 +72,44 @@ type GlobalObjects struct {
 	Users  map[string]User  `json:"users"`
 }
 
+type Cursor struct {
+	Value      string `json:"value"`
+	CursorType string `json:"cursorType"`
+}
+
+type Operation struct {
+	Cursor Cursor `json:"cursor"`
+}
+
+type Content struct {
+	Operation Operation `json:"operation"`
+}
+
+type Entry struct {
+	EntryId   string  `json:"entryId"`
+	SortIndex string  `json:"sortIndex"`
+	Content   Content `json:"content"`
+}
+
+type AddEntries struct {
+	Entries []Entry `json:"entries"`
+}
+
+type ReplaceEntry struct {
+	EntryIdToReplace string `json:"entryIdToReplace"`
+	Entry            Entry  `json:"entry"`
+}
+
+type Instruction struct {
+	AddEntries   AddEntries   `json:"addEntries"`
+	ReplaceEntry ReplaceEntry `json:"replaceEntry"`
+}
+
+type Timeline struct {
+	Id           string        `json:"id"`
+	Instructions []Instruction `json:"instructions"`
+}
+
 type Error struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
@@ -59,5 +117,22 @@ type Error struct {
 
 type AdaptiveJson struct {
 	GlobalObjects GlobalObjects `json:"globalObjects"`
+	Timeline      Timeline      `json:"timeline"`
 	Errors        []Error       `json:"errors"`
+}
+
+func (j *AdaptiveJson) FindCursor() (string, error) {
+	for _, i := range j.Timeline.Instructions {
+		if i.ReplaceEntry.EntryIdToReplace == "sq-cursor-bottom" {
+			return i.ReplaceEntry.Entry.Content.Operation.Cursor.Value, nil
+		}
+	}
+
+	for _, e := range j.Timeline.Instructions[0].AddEntries.Entries {
+		if e.EntryId == "sq-cursor-bottom" {
+			return e.Content.Operation.Cursor.Value, nil
+		}
+	}
+
+	return "", fmt.Errorf("cursor not found")
 }

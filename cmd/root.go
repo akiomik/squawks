@@ -46,21 +46,12 @@ var rootCmd = &cobra.Command{
 			client.UserAgent = userAgent
 		}
 
-		json, err := client.Search(query)
-		if err != nil {
-			fmt.Println("Error:", err.Error())
-			os.Exit(1)
-		}
+		ch := client.SearchAll(query)
 
-		if len(json.Errors) != 0 {
-			for _, err := range json.Errors {
-				fmt.Printf("%d: %s\n", err.Code, err.Message)
+		for json := range ch {
+			for _, tweet := range json.GlobalObjects.Tweets {
+				fmt.Printf("%+v\n", tweet)
 			}
-			os.Exit(1)
-		}
-
-		for _, tweet := range json.GlobalObjects.Tweets {
-			fmt.Printf("%+v\n", tweet)
 		}
 	},
 }

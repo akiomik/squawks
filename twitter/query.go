@@ -15,7 +15,6 @@
 package twitter
 
 import (
-	"fmt"
 	"net/url"
 	"strings"
 )
@@ -42,6 +41,5 @@ func (q *Query) Encode() string {
 	}
 
 	res := strings.Join(ss[:], url.QueryEscape(" "))
-	fmt.Println(res)
 	return res
 }

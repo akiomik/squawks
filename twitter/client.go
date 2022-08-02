@@ -16,6 +16,7 @@ package twitter
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -43,7 +44,7 @@ func (c *Client) get(url *url.URL) (*http.Response, error) {
 	}
 	req.Header.Set("User-Agent", c.UserAgent)
 	req.Header.Set("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA")
-	req.Header.Set("x-guest-token", "1554145683879641089")
+	req.Header.Set("x-guest-token", "1554370317552091136")
 
 	res, err := c.Client.Do(req)
 	if err != nil {
@@ -53,17 +54,22 @@ func (c *Client) get(url *url.URL) (*http.Response, error) {
 	return res, nil
 }
 
-func (c *Client) Search(q Query) (*AdaptiveJson, error) {
-	url, _ := url.Parse(
+func (c *Client) Search(q Query, cursor string) (*AdaptiveJson, error) {
+	urlString :=
 		"https://twitter.com/i/api/2/search/adaptive.json" +
 			"?q=" + q.Encode() +
 			"&include_quote_count=true" +
 			"&include_reply_count=1" +
 			"&tweet_mode=extended" +
-			"&count=100" +
+			"&count=40" +
 			"&query_source=typed_query" +
-			"&cursor=-1",
-	)
+			"&tweet_search_mode=live"
+
+	if len(cursor) != 0 {
+		urlString += "&cursor=" + url.QueryEscape(cursor)
+	}
+
+	url, _ := url.Parse(urlString)
 	res, err := c.get(url)
 	if err != nil {
 		return nil, err
@@ -81,5 +87,42 @@ func (c *Client) Search(q Query) (*AdaptiveJson, error) {
 		return nil, err
 	}
 
+	if len(adaptiveJson.Errors) != 0 {
+		message := ""
+		for _, err := range adaptiveJson.Errors {
+			message += fmt.Sprintf("[%d] %s\n", err.Code, err.Message)
+		}
+
+		return nil, fmt.Errorf("Error: %s", message)
+	}
+
 	return adaptiveJson, nil
+}
+
+func (c *Client) SearchAll(q Query) <-chan *AdaptiveJson {
+	ch := make(chan *AdaptiveJson)
+
+	go func() {
+		defer close(ch)
+
+		cursor := ""
+		for {
+			adaptiveJson, err := c.Search(q, cursor)
+			if err != nil {
+				panic(err)
+			}
+
+			ch <- adaptiveJson
+			if len(adaptiveJson.GlobalObjects.Tweets) == 0 {
+				break
+			}
+
+			cursor, err = adaptiveJson.FindCursor()
+			if err != nil {
+				panic(err)
+			}
+		}
+	}()
+
+	return ch
 }
