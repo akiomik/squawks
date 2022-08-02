@@ -21,9 +21,21 @@ import (
 
 type RubyDate time.Time
 
+func (t *RubyDate) Iso8601() string {
+	return time.Time(*t).Format("2006-01-02T15:04:05-07:00")
+}
+
+func (t *RubyDate) String() string {
+	return time.Time(*t).Format(time.RubyDate)
+}
+
+func (t *RubyDate) Equal(u RubyDate) bool {
+	return time.Time(*t).Equal(time.Time(u))
+}
+
 func (t *RubyDate) UnmarshalJSON(buf []byte) error {
 	s := bytes.Trim(buf, `"`)
-	parsed, err := time.Parse(time.RubyDate, string(s))
+	parsed, err := time.ParseInLocation(time.RubyDate, string(s), time.UTC)
 	if err != nil {
 		return err
 	}
