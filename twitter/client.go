@@ -55,6 +55,26 @@ func (c *Client) get(url *url.URL) (*http.Response, error) {
 	return res, nil
 }
 
+func (c *Client) GetJson(u *url.URL, v any) error {
+	res, err := c.get(u)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	blob, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(blob, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *Client) Search(q Query, cursor string) (*AdaptiveJson, error) {
 	urlString :=
 		"https://twitter.com/i/api/2/search/adaptive.json" +
@@ -70,34 +90,23 @@ func (c *Client) Search(q Query, cursor string) (*AdaptiveJson, error) {
 		urlString += "&cursor=" + url.QueryEscape(cursor)
 	}
 
-	url, _ := url.Parse(urlString)
-	res, err := c.get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	blob, err := ioutil.ReadAll(res.Body)
+	j := new(AdaptiveJson)
+	u, _ := url.Parse(urlString)
+	err := c.GetJson(u, j)
 	if err != nil {
 		return nil, err
 	}
 
-	adaptiveJson := new(AdaptiveJson)
-	err = json.Unmarshal(blob, &adaptiveJson)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(adaptiveJson.Errors) != 0 {
+	if len(j.Errors) != 0 {
 		message := ""
-		for _, err := range adaptiveJson.Errors {
+		for _, err := range j.Errors {
 			message += fmt.Sprintf("[%d] %s\n", err.Code, err.Message)
 		}
 
-		return adaptiveJson, fmt.Errorf("Error: %s", message)
+		return j, fmt.Errorf("Error: %s", message)
 	}
 
-	return adaptiveJson, nil
+	return j, nil
 }
 
 func (c *Client) SearchAll(q Query) <-chan *AdaptiveJson {
@@ -108,18 +117,18 @@ func (c *Client) SearchAll(q Query) <-chan *AdaptiveJson {
 
 		cursor := ""
 		for {
-			adaptiveJson, err := c.Search(q, cursor)
+			j, err := c.Search(q, cursor)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 				panic(err)
 			}
 
-			ch <- adaptiveJson
-			if len(adaptiveJson.GlobalObjects.Tweets) == 0 {
+			ch <- j
+			if len(j.GlobalObjects.Tweets) == 0 {
 				break
 			}
 
-			cursor, err = adaptiveJson.FindCursor()
+			cursor, err = j.FindCursor()
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 				panic(err)

@@ -18,6 +18,7 @@
 package twitter
 
 import (
+	"net/url"
 	"reflect"
 	"testing"
 
@@ -36,7 +37,70 @@ func TestNewClient(t *testing.T) {
 	}
 }
 
-func TestSearchWhenInvalidJsonIsReturened(t *testing.T) {
+type TestEntityJson struct {
+	Id uint `json:"id"`
+}
+
+func TestGetJsonWhenValidJson(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	urlString := "https://example.com/entities/1"
+	res := `{ "id": 1 }`
+	httpmock.RegisterResponder("GET", urlString, httpmock.NewStringResponder(200, res))
+
+	c := NewClient()
+	actual := new(TestEntityJson)
+	u, _ := url.Parse(urlString)
+	err := c.GetJson(u, actual)
+	if err != nil {
+		t.Errorf("Expect error, got nil")
+		return
+	}
+
+	expected := TestEntityJson{Id: 1}
+	if !reflect.DeepEqual(*actual, expected) {
+		t.Errorf("Expect %+v, but got %+v", expected, *actual)
+	}
+
+	httpmock.GetTotalCallCount()
+	info := httpmock.GetCallCountInfo()
+
+	count := info["GET "+urlString]
+	if count != 1 {
+		t.Errorf("The request GET %s was expected to execute once, but it called %d time(s)", urlString, count)
+		return
+	}
+}
+
+func TestGetJsonWhenUnexpectedJson(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	urlString := "https://example.com/entities/1"
+	res := `[]`
+	httpmock.RegisterResponder("GET", urlString, httpmock.NewStringResponder(200, res))
+
+	c := NewClient()
+	j := new(TestEntityJson)
+	u, _ := url.Parse(urlString)
+	err := c.GetJson(u, j)
+	if err == nil {
+		t.Errorf("Expect error, got nil")
+		return
+	}
+
+	httpmock.GetTotalCallCount()
+	info := httpmock.GetCallCountInfo()
+
+	count := info["GET "+urlString]
+	if count != 1 {
+		t.Errorf("The request GET %s was expected to execute once, but it called %d time(s)", urlString, count)
+		return
+	}
+}
+
+func TestSearchWhenUnexpectedJson(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
