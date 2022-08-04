@@ -33,7 +33,7 @@ type Client struct {
 func NewClient() *Client {
 	client := Client{}
 	client.Client = http.DefaultClient
-	client.UserAgent = "get-old-tweets/v" + config.Version
+	client.UserAgent = "get-old-tweets/" + config.Version
 
 	return &client
 }
@@ -94,7 +94,7 @@ func (c *Client) Search(q Query, cursor string) (*AdaptiveJson, error) {
 			message += fmt.Sprintf("[%d] %s\n", err.Code, err.Message)
 		}
 
-		return nil, fmt.Errorf("Error: %s", message)
+		return adaptiveJson, fmt.Errorf("Error: %s", message)
 	}
 
 	return adaptiveJson, nil
