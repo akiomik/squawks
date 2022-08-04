@@ -1,4 +1,4 @@
-.PHONY: build clean update fmt test test-small test-medium
+.PHONY: build clean update fmt test test-small test-medium coverage
 
 build:
 	go build -v .
@@ -24,3 +24,7 @@ test-small:
 
 test-medium:
 	go test -v -tags=medium ./...
+
+coverage:
+	go test ./... -tags=small,medium -covermode=count -coverprofile=c.out
+	go tool cover -html=c.out -o coverage.html

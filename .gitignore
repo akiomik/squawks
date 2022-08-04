@@ -14,3 +14,4 @@
 *.out
 
 get-old-tweets
+coverage.html
