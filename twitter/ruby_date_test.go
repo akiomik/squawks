@@ -76,7 +76,7 @@ func TestEqual(t *testing.T) {
 	}
 }
 
-func TestUnmarshall(t *testing.T) {
+func TestUnmarshallWhenSucceeded(t *testing.T) {
 	jsonString := `{
     "created_at": "Mon Aug 19 02:04:28 +0000 2013"
   }`
@@ -92,6 +92,19 @@ func TestUnmarshall(t *testing.T) {
 	actual := schema.CreatedAt
 	if !actual.Equal(expected) {
 		t.Errorf("Expect RubyDate#Unmarshal() = \"%v\", but got \"%v\"", expected, actual)
+		return
+	}
+}
+
+func TestUnmarshallWhenFailed(t *testing.T) {
+	jsonString := `{
+    "created_at": "2013-01-08-19T02:04:28+00:00"
+  }`
+
+	schema := new(TestSchema)
+	err := json.Unmarshal([]byte(jsonString), &schema)
+	if err == nil {
+		t.Errorf("Expect Query#Encode() to return error object, but got nil")
 		return
 	}
 }
