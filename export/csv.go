@@ -39,16 +39,16 @@ func ExportCsv(f *os.File, ch <-chan *twitter.AdaptiveJson) <-chan struct{} {
 		for j := range ch {
 			for _, k := range ReversedKeysOf(j.GlobalObjects.Tweets) {
 				t := j.GlobalObjects.Tweets[k]
-				u := j.GlobalObjects.Users[strconv.FormatInt(t.UserId, 10)]
+				u := j.GlobalObjects.Users[strconv.FormatUint(t.UserId, 10)]
 				r := []string{
-					strconv.FormatInt(t.Id, 10),
+					strconv.FormatUint(t.Id, 10),
 					u.ScreenName,
 					t.CreatedAt.Iso8601(),
 					t.FullText,
-					strconv.FormatInt(t.RetweetCount, 10),
-					strconv.FormatInt(t.FavoriteCount, 10),
-					strconv.FormatInt(t.ReplyCount, 10),
-					strconv.FormatInt(t.QuoteCount, 10),
+					strconv.FormatUint(t.RetweetCount, 10),
+					strconv.FormatUint(t.FavoriteCount, 10),
+					strconv.FormatUint(t.ReplyCount, 10),
+					strconv.FormatUint(t.QuoteCount, 10),
 					t.Geo,
 					t.Coodinates,
 					t.Lang,

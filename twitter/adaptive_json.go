@@ -35,13 +35,13 @@ type Place struct {
 }
 
 type Tweet struct {
-	Id            int64    `json:"id"`
-	UserId        int64    `json:"user_id"`
+	Id            uint64   `json:"id"`
+	UserId        uint64   `json:"user_id"`
 	FullText      string   `json:"full_text"`
-	RetweetCount  int64    `json:"retweet_count"`
-	FavoriteCount int64    `json:"favorite_count"`
-	ReplyCount    int64    `json:"reply_count"`
-	QuoteCount    int64    `json:"quote_count"`
+	RetweetCount  uint64   `json:"retweet_count"`
+	FavoriteCount uint64   `json:"favorite_count"`
+	ReplyCount    uint64   `json:"reply_count"`
+	QuoteCount    uint64   `json:"quote_count"`
 	Geo           string   `json:"geo"`
 	Coodinates    string   `json:"coordinates"`
 	Place         Place    `json:"place"`
@@ -51,18 +51,18 @@ type Tweet struct {
 }
 
 type User struct {
-	Id              int64    `json:"id"`
+	Id              uint64   `json:"id"`
 	Name            string   `json:"name"`
 	ScreenName      string   `json:"screen_name"`
 	Location        string   `json:"location"`
 	Description     string   `json:"description"`
 	Url             string   `json:"url"`
-	FollowersCount  int64    `json:"followers_count"`
-	FriendsCount    int64    `json:"friends_count"`
-	ListedCount     int64    `json:"listed_count"`
-	FavouritesCount int64    `json:"favourites_count"`
-	StatusesCount   int64    `json:"statuses_count"`
-	MediaCount      int64    `json:"media_count"`
+	FollowersCount  uint64   `json:"followers_count"`
+	FriendsCount    uint64   `json:"friends_count"`
+	ListedCount     uint64   `json:"listed_count"`
+	FavouritesCount uint64   `json:"favourites_count"`
+	StatusesCount   uint64   `json:"statuses_count"`
+	MediaCount      uint64   `json:"media_count"`
 	Verified        bool     `json:"verified"`
 	CreatedAt       RubyDate `json:"created_at"`
 }
