@@ -18,7 +18,6 @@
 package twitter
 
 import (
-	"net/url"
 	"reflect"
 	"testing"
 
@@ -30,9 +29,15 @@ import (
 func TestNewClient(t *testing.T) {
 	c := NewClient()
 
-	expected := "get-old-tweets/" + config.Version
-	if c.UserAgent != expected {
-		t.Errorf(`Expect c.UserAgent = "%s", but got "%s"`, expected, c.UserAgent)
+	expectedUserAgent := "get-old-tweets/" + config.Version
+	if c.UserAgent != expectedUserAgent {
+		t.Errorf(`Expect "%s", but got "%s"`, expectedUserAgent, c.UserAgent)
+		return
+	}
+
+	expectedGuestToken := ""
+	if c.GuestToken != expectedGuestToken {
+		t.Errorf(`Expect "%s", but got "%s"`, expectedGuestToken, c.GuestToken)
 		return
 	}
 }
@@ -41,18 +46,16 @@ type TestEntityJson struct {
 	Id uint `json:"id"`
 }
 
-func TestGetJsonWhenValidJson(t *testing.T) {
+func TestJsonRequestWhenValidJson(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	urlString := "https://example.com/entities/1"
-	res := `{ "id": 1 }`
-	httpmock.RegisterResponder("GET", urlString, httpmock.NewStringResponder(200, res))
+	url := "https://example.com/entities/1"
+	httpmock.RegisterResponder("GET", url, httpmock.NewStringResponder(200, `{ "id": 1 }`))
 
 	c := NewClient()
 	actual := new(TestEntityJson)
-	u, _ := url.Parse(urlString)
-	err := c.GetJson(u, actual)
+	err := c.JsonRequest("GET", url, actual)
 	if err != nil {
 		t.Errorf("Expect error, got nil")
 		return
@@ -66,25 +69,23 @@ func TestGetJsonWhenValidJson(t *testing.T) {
 	httpmock.GetTotalCallCount()
 	info := httpmock.GetCallCountInfo()
 
-	count := info["GET "+urlString]
+	count := info["GET "+url]
 	if count != 1 {
-		t.Errorf("The request GET %s was expected to execute once, but it called %d time(s)", urlString, count)
+		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url, count)
 		return
 	}
 }
 
-func TestGetJsonWhenUnexpectedJson(t *testing.T) {
+func TestJsonRequestWhenUnexpectedJson(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	urlString := "https://example.com/entities/1"
-	res := `[]`
-	httpmock.RegisterResponder("GET", urlString, httpmock.NewStringResponder(200, res))
+	url := "https://example.com/entities/1"
+	httpmock.RegisterResponder("GET", url, httpmock.NewStringResponder(200, `[]`))
 
 	c := NewClient()
-	j := new(TestEntityJson)
-	u, _ := url.Parse(urlString)
-	err := c.GetJson(u, j)
+	res := new(TestEntityJson)
+	err := c.JsonRequest("GET", url, res)
 	if err == nil {
 		t.Errorf("Expect error, got nil")
 		return
@@ -93,9 +94,9 @@ func TestGetJsonWhenUnexpectedJson(t *testing.T) {
 	httpmock.GetTotalCallCount()
 	info := httpmock.GetCallCountInfo()
 
-	count := info["GET "+urlString]
+	count := info["GET "+url]
 	if count != 1 {
-		t.Errorf("The request GET %s was expected to execute once, but it called %d time(s)", urlString, count)
+		t.Errorf("The request GET %s was expected to execute once, but it called %d time(s)", url, count)
 		return
 	}
 }

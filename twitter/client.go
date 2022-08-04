@@ -26,26 +26,32 @@ import (
 )
 
 type Client struct {
-	Client    *http.Client
-	UserAgent string
+	Client     *http.Client
+	UserAgent  string
+	AuthToken  string
+	GuestToken string
 }
 
 func NewClient() *Client {
 	client := Client{}
 	client.Client = http.DefaultClient
 	client.UserAgent = "get-old-tweets/" + config.Version
+	client.AuthToken = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
 	return &client
 }
 
-func (c *Client) get(url *url.URL) (*http.Response, error) {
-	req, err := http.NewRequest("GET", url.String(), nil)
+func (c *Client) Request(m string, u string) (*http.Response, error) {
+	req, err := http.NewRequest(m, u, nil)
 	if err != nil {
 		return nil, err
 	}
+
 	req.Header.Set("User-Agent", c.UserAgent)
-	req.Header.Set("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA")
-	req.Header.Set("x-guest-token", "1554560694741520384")
+	req.Header.Set("Authorization", c.AuthToken)
+	if len(c.GuestToken) != 0 {
+		req.Header.Set("x-guest-token", c.GuestToken)
+	}
 
 	res, err := c.Client.Do(req)
 	if err != nil {
@@ -55,8 +61,8 @@ func (c *Client) get(url *url.URL) (*http.Response, error) {
 	return res, nil
 }
 
-func (c *Client) GetJson(u *url.URL, v any) error {
-	res, err := c.get(u)
+func (c *Client) JsonRequest(m string, u string, v any) error {
+	res, err := c.Request(m, u)
 	if err != nil {
 		return err
 	}
@@ -76,7 +82,7 @@ func (c *Client) GetJson(u *url.URL, v any) error {
 }
 
 func (c *Client) Search(q Query, cursor string) (*AdaptiveJson, error) {
-	urlString :=
+	u :=
 		"https://twitter.com/i/api/2/search/adaptive.json" +
 			"?q=" + q.Encode() +
 			"&include_quote_count=true" +
@@ -87,26 +93,25 @@ func (c *Client) Search(q Query, cursor string) (*AdaptiveJson, error) {
 			"&tweet_search_mode=live"
 
 	if len(cursor) != 0 {
-		urlString += "&cursor=" + url.QueryEscape(cursor)
+		u += "&cursor=" + url.QueryEscape(cursor)
 	}
 
-	j := new(AdaptiveJson)
-	u, _ := url.Parse(urlString)
-	err := c.GetJson(u, j)
+	res := new(AdaptiveJson)
+	err := c.JsonRequest("GET", u, res)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(j.Errors) != 0 {
+	if len(res.Errors) != 0 {
 		message := ""
-		for _, err := range j.Errors {
+		for _, err := range res.Errors {
 			message += fmt.Sprintf("[%d] %s\n", err.Code, err.Message)
 		}
 
-		return j, fmt.Errorf("Error: %s", message)
+		return res, fmt.Errorf("Error: %s", message)
 	}
 
-	return j, nil
+	return res, nil
 }
 
 func (c *Client) SearchAll(q Query) <-chan *AdaptiveJson {
@@ -117,18 +122,18 @@ func (c *Client) SearchAll(q Query) <-chan *AdaptiveJson {
 
 		cursor := ""
 		for {
-			j, err := c.Search(q, cursor)
+			res, err := c.Search(q, cursor)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 				panic(err)
 			}
 
-			ch <- j
-			if len(j.GlobalObjects.Tweets) == 0 {
+			ch <- res
+			if len(res.GlobalObjects.Tweets) == 0 {
 				break
 			}
 
-			cursor, err = j.FindCursor()
+			cursor, err = res.FindCursor()
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 				panic(err)
