@@ -1,4 +1,4 @@
-.PHONY: build clean update fmt test
+.PHONY: build clean update fmt test test-small test-medium
 
 build:
 	go build -v .
@@ -17,4 +17,10 @@ lint:
 	staticcheck ./...
 
 test:
-	go test -v ./...
+	go test -v -tags=small,medium ./...
+
+test-small:
+	go test -v -tags=small ./...
+
+test-medium:
+	go test -v -tags=medium ./...

@@ -12,6 +12,9 @@
 // see the license for the specific language governing permissions and
 // limitations under the license.
 
+//go:build medium
+// +build medium
+
 package export
 
 import (
