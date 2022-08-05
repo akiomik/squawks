@@ -14,6 +14,10 @@
 
 package twitter
 
+import (
+  "fmt"
+)
+
 type Error struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
@@ -21,4 +25,13 @@ type Error struct {
 
 type ErrorResponse struct {
 	Errors []Error `json:"errors"`
+}
+
+func (res *ErrorResponse) Error() string {
+  message := ""
+  for _, e := range res.Errors {
+    message += fmt.Sprintf("%d: %s\n", e.Code, e.Message)
+  }
+
+  return message
 }

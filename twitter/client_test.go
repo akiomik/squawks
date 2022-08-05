@@ -76,20 +76,15 @@ func TestSearchWhenWithoutCursor(t *testing.T) {
 	})
 
 	q := Query{Text: "foo"}
-	success, failure, err := c.Search(q, "", "")
+	actual, err := c.Search(q, "", "")
 	if err != nil {
 		t.Errorf("Expect Client#Search not to return error objects, but got %v", err)
 		return
 	}
 
-	if failure != nil {
-		t.Errorf("Expect nil, got %+v", failure)
-		return
-	}
-
 	expected := Adaptive{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
-	if !reflect.DeepEqual(*success, expected) {
-		t.Errorf("Expect %+v, got %+v", expected, *success)
+	if !reflect.DeepEqual(*actual, expected) {
+		t.Errorf("Expect %+v, got %+v", expected, *actual)
 		return
 	}
 
@@ -117,20 +112,15 @@ func TestSearchWhenWithCursor(t *testing.T) {
 	})
 
 	q := Query{Text: "foo"}
-	success, failure, err := c.Search(q, "", "scroll:deadbeef")
+	actual, err := c.Search(q, "", "scroll:deadbeef")
 	if err != nil {
 		t.Errorf("Expect not error objects, got %v", err)
 		return
 	}
 
-	if failure != nil {
-		t.Errorf("Expect nil, got %+v", failure)
-		return
-	}
-
 	expected := Adaptive{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
-	if !reflect.DeepEqual(*success, expected) {
-		t.Errorf("Expect %+v, got %+v", expected, *success)
+	if !reflect.DeepEqual(*actual, expected) {
+		t.Errorf("Expect %+v, got %+v", expected, *actual)
 		return
 	}
 
@@ -158,20 +148,17 @@ func TestSearchWhenError(t *testing.T) {
 	})
 
 	q := Query{Text: "foo"}
-	success, failure, err := c.Search(q, "", "")
-	if err != nil {
-		t.Errorf("Expect not error objects, got %v", err)
+	actualAdaptive, err := c.Search(q, "", "")
+
+	expectedError := ErrorResponse{Errors: []Error{Error{Code: 200, Message: "forbidden"}}}
+  actualError, ok := err.(*ErrorResponse)
+	if !ok || !reflect.DeepEqual(*actualError, expectedError) {
+		t.Errorf("Expect %+v, got %+v", expectedError, *actualError)
 		return
 	}
 
-	expectedFailure := ErrorResponse{Errors: []Error{Error{Code: 200, Message: "forbidden"}}}
-	if !reflect.DeepEqual(*failure, expectedFailure) {
-		t.Errorf("Expect %+v, got %+v", expectedFailure, *failure)
-		return
-	}
-
-	if success != nil {
-		t.Errorf("Expect nil, got %+v", success)
+	if actualAdaptive != nil {
+		t.Errorf("Expect nil, got %+v", actualAdaptive)
 		return
 	}
 
