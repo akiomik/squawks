@@ -18,6 +18,7 @@
 package twitter
 
 import (
+	"net/http"
 	"reflect"
 	"testing"
 
@@ -31,129 +32,59 @@ func TestNewClient(t *testing.T) {
 
 	expectedUserAgent := "get-old-tweets/" + config.Version
 	if c.UserAgent != expectedUserAgent {
-		t.Errorf(`Expect "%s", but got "%s"`, expectedUserAgent, c.UserAgent)
+		t.Errorf(`Expect "%s", got "%s"`, expectedUserAgent, c.UserAgent)
 		return
 	}
 
-	expectedGuestToken := ""
-	if c.GuestToken != expectedGuestToken {
-		t.Errorf(`Expect "%s", but got "%s"`, expectedGuestToken, c.GuestToken)
+	if len(c.AuthToken) == 0 {
+		t.Errorf(`Expect not "", got "%s"`, c.AuthToken)
 		return
 	}
 }
 
-type TestEntityJson struct {
-	Id uint `json:"id"`
-}
-
-func TestJsonRequestWhenValidJson(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	url := "https://example.com/entities/1"
-	httpmock.RegisterResponder("GET", url, httpmock.NewStringResponder(200, `{ "id": 1 }`))
-
+func TestRequest(t *testing.T) {
 	c := NewClient()
-	actual := new(TestEntityJson)
-	err := c.JsonRequest("GET", url, actual)
-	if err != nil {
-		t.Errorf("Expect error, got nil")
-		return
+
+	expectedUserAgent := "custom-user-agent"
+	expectedAuthToken := "my-auth-token"
+
+	c.UserAgent = expectedUserAgent
+	c.AuthToken = expectedAuthToken
+	client := c.Request()
+
+	if client.Header.Get("User-Agent") != expectedUserAgent {
+		t.Errorf(`Expect "%v", got "%v"`, expectedUserAgent, client.Header.Get("User-Agent"))
 	}
 
-	expected := TestEntityJson{Id: 1}
-	if !reflect.DeepEqual(*actual, expected) {
-		t.Errorf("Expect %+v, but got %+v", expected, *actual)
-	}
-
-	httpmock.GetTotalCallCount()
-	info := httpmock.GetCallCountInfo()
-
-	count := info["GET "+url]
-	if count != 1 {
-		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url, count)
-		return
-	}
-}
-
-func TestJsonRequestWhenUnexpectedJson(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	url := "https://example.com/entities/1"
-	httpmock.RegisterResponder("GET", url, httpmock.NewStringResponder(200, `[]`))
-
-	c := NewClient()
-	res := new(TestEntityJson)
-	err := c.JsonRequest("GET", url, res)
-	if err == nil {
-		t.Errorf("Expect error, got nil")
-		return
-	}
-
-	httpmock.GetTotalCallCount()
-	info := httpmock.GetCallCountInfo()
-
-	count := info["GET "+url]
-	if count != 1 {
-		t.Errorf("The request GET %s was expected to execute once, but it called %d time(s)", url, count)
-		return
-	}
-}
-
-func TestSearchWhenUnexpectedJson(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	url := "https://twitter.com/i/api/2/search/adaptive.json?q=foo&include_quote_count=true&include_reply_count=1&tweet_mode=extended&count=40&query_source=typed_query&tweet_search_mode=live"
-	res := `{ "globalObjects": [] }`
-	httpmock.RegisterResponder("GET", url, httpmock.NewStringResponder(200, res))
-
-	c := NewClient()
-	q := Query{Text: "foo"}
-	actualJson, err := c.Search(q, "")
-	if err == nil {
-		t.Errorf("Expect Client#Search to return error objects, but got nil")
-		return
-	}
-
-	if actualJson != nil {
-		t.Errorf("Expect Client#Search to nil, but got %+v", actualJson)
-	}
-
-	httpmock.GetTotalCallCount()
-	info := httpmock.GetCallCountInfo()
-
-	if info["GET "+url] != 1 {
-		t.Errorf("Expect Client#Search to call %s once, but it called %d time(s)", url, info["GET "+url])
-		return
-	}
-
-	if len(info) != 1 {
-		t.Errorf("Expect Client#Search to call %s only, but it called other urls too: %v", url, info)
-		return
+	if client.Token != expectedAuthToken {
+		t.Errorf(`Expect "%v", got "%v"`, expectedAuthToken, client.Token)
 	}
 }
 
 func TestSearchWhenWithoutCursor(t *testing.T) {
-	httpmock.Activate()
+	c := NewClient()
+
+	httpmock.ActivateNonDefault(c.Client.GetClient())
 	defer httpmock.DeactivateAndReset()
 
-	url := "https://twitter.com/i/api/2/search/adaptive.json?q=foo&include_quote_count=true&include_reply_count=1&tweet_mode=extended&count=40&query_source=typed_query&tweet_search_mode=live"
+	url := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
 	res := `{ "globalObjects": { "tweets": {}, "users": {} } }`
-	httpmock.RegisterResponder("GET", url, httpmock.NewStringResponder(200, res))
+	httpmock.RegisterResponder("GET", url, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(200, res)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
 
-	c := NewClient()
 	q := Query{Text: "foo"}
-	actualJson, err := c.Search(q, "")
+	actual, err := c.Search(q, "", "")
 	if err != nil {
 		t.Errorf("Expect Client#Search not to return error objects, but got %v", err)
 		return
 	}
 
-	expectedJson := AdaptiveJson{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
-	if !reflect.DeepEqual(*actualJson, expectedJson) {
-		t.Errorf("Expect Client#Search to return %+v, but got %+v", expectedJson, actualJson)
+	expected := AdaptiveJson{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
+	if !reflect.DeepEqual(*actual, expected) {
+		t.Errorf("Expect Client#Search to return %+v, but got %+v", expected, *actual)
 		return
 	}
 
@@ -172,60 +103,29 @@ func TestSearchWhenWithoutCursor(t *testing.T) {
 }
 
 func TestSearchWhenWithCursor(t *testing.T) {
-	httpmock.Activate()
+	c := NewClient()
+
+	httpmock.ActivateNonDefault(c.Client.GetClient())
 	defer httpmock.DeactivateAndReset()
 
-	url := "https://twitter.com/i/api/2/search/adaptive.json?q=foo&include_quote_count=true&include_reply_count=1&tweet_mode=extended&count=40&query_source=typed_query&tweet_search_mode=live&cursor=scroll%3Adeadbeef"
+	url := "https://twitter.com/i/api/2/search/adaptive.json?count=40&cursor=scroll%3Adeadbeef&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
 	res := `{ "globalObjects": { "tweets": {}, "users": {} } }`
-	httpmock.RegisterResponder("GET", url, httpmock.NewStringResponder(200, res))
+	httpmock.RegisterResponder("GET", url, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(200, res)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
 
-	c := NewClient()
 	q := Query{Text: "foo"}
-	actualJson, err := c.Search(q, "scroll:deadbeef")
+	actual, err := c.Search(q, "", "scroll:deadbeef")
 	if err != nil {
 		t.Errorf("Expect Client#Search not to return error objects, but got %v", err)
 		return
 	}
 
-	expectedJson := AdaptiveJson{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
-	if !reflect.DeepEqual(*actualJson, expectedJson) {
-		t.Errorf("Expect Client#Search to return %+v, but got %+v", expectedJson, actualJson)
-		return
-	}
-
-	httpmock.GetTotalCallCount()
-	info := httpmock.GetCallCountInfo()
-
-	if info["GET "+url] != 1 {
-		t.Errorf("Expect Client#Search to call %s once, but it called %d time(s)", url, info["GET "+url])
-		return
-	}
-
-	if len(info) != 1 {
-		t.Errorf("Expect Client#Search to call %s only, but it called other urls too: %v", url, info)
-		return
-	}
-}
-
-func TestSearchWhenErrorsExist(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	url := "https://twitter.com/i/api/2/search/adaptive.json?q=foo&include_quote_count=true&include_reply_count=1&tweet_mode=extended&count=40&query_source=typed_query&tweet_search_mode=live"
-	res := `{ "errors": [{ "code": 200, "message": "Forbidden" }] }`
-	httpmock.RegisterResponder("GET", url, httpmock.NewStringResponder(200, res))
-
-	c := NewClient()
-	q := Query{Text: "foo"}
-	actualJson, err := c.Search(q, "")
-	if err == nil {
-		t.Errorf("Expect Client#Search to return error objects, but got nil")
-		return
-	}
-
-	expectedJson := AdaptiveJson{Errors: []Error{Error{Code: 200, Message: "Forbidden"}}}
-	if !reflect.DeepEqual(*actualJson, expectedJson) {
-		t.Errorf("Expect Client#Search to return %+v, but got %+v", expectedJson, actualJson)
+	expected := AdaptiveJson{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
+	if !reflect.DeepEqual(*actual, expected) {
+		t.Errorf("Expect Client#Search to return %+v, but got %+v", expected, *actual)
 		return
 	}
 
@@ -244,27 +144,28 @@ func TestSearchWhenErrorsExist(t *testing.T) {
 }
 
 func TestSearchAllWhenRestTweetDoNotExist(t *testing.T) {
-	httpmock.Activate()
+	c := NewClient()
+
+	httpmock.ActivateNonDefault(c.Client.GetClient())
 	defer httpmock.DeactivateAndReset()
 
-	url := "https://twitter.com/i/api/2/search/adaptive.json?q=foo&include_quote_count=true&include_reply_count=1&tweet_mode=extended&count=40&query_source=typed_query&tweet_search_mode=live"
+	url := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
 	res := `{}`
 	httpmock.RegisterResponder("GET", url, httpmock.NewStringResponder(200, res))
 
-	c := NewClient()
 	q := Query{Text: "foo"}
 	ch := c.SearchAll(q)
 
-	expectedJson1 := AdaptiveJson{}
-	actualJson1 := <-ch
-	if !reflect.DeepEqual(*actualJson1, expectedJson1) {
-		t.Errorf("Expect Client#SearchAll to send %+v first, but got %+v", expectedJson1, *actualJson1)
+	expected1 := AdaptiveJson{}
+	actual1 := <-ch
+	if !reflect.DeepEqual(*actual1, expected1) {
+		t.Errorf("Expect %+v first, got %+v", expected1, *actual1)
 		return
 	}
 
-	actualJson2 := <-ch
-	if actualJson2 != nil {
-		t.Errorf("Expect Client#SearchAll to send nil second, but got %+v", actualJson2)
+	actual2 := <-ch
+	if actual2 != nil {
+		t.Errorf("Expect nil second, got %+v", actual2)
 		return
 	}
 
@@ -272,21 +173,18 @@ func TestSearchAllWhenRestTweetDoNotExist(t *testing.T) {
 	info := httpmock.GetCallCountInfo()
 
 	if info["GET "+url] != 1 {
-		t.Errorf("Expect Client#SearchAll to call %s once, but it called %d time(s)", url, info["GET "+url])
-		return
-	}
-
-	if len(info) != 1 {
-		t.Errorf("Expect Client#SearchAll to call %s only, but it called other urls too: %v", url, info)
+		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url, info["GET "+url])
 		return
 	}
 }
 
 func TestSearchAllWhenRestTweetsExist(t *testing.T) {
-	httpmock.Activate()
+	c := NewClient()
+
+	httpmock.ActivateNonDefault(c.Client.GetClient())
 	defer httpmock.DeactivateAndReset()
 
-	url1 := "https://twitter.com/i/api/2/search/adaptive.json?q=foo&include_quote_count=true&include_reply_count=1&tweet_mode=extended&count=40&query_source=typed_query&tweet_search_mode=live"
+	url1 := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
 	res1 := `{
     "globalObjects": {
       "tweets": {
@@ -312,17 +210,24 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
       }]
     }
   }`
-	httpmock.RegisterResponder("GET", url1, httpmock.NewStringResponder(200, res1))
+	httpmock.RegisterResponder("GET", url1, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(200, res1)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
 
-	url2 := "https://twitter.com/i/api/2/search/adaptive.json?q=foo&include_quote_count=true&include_reply_count=1&tweet_mode=extended&count=40&query_source=typed_query&tweet_search_mode=live&cursor=scroll%3Adeadbeef"
+	url2 := "https://twitter.com/i/api/2/search/adaptive.json?count=40&cursor=scroll%3Adeadbeef&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
 	res2 := `{}`
-	httpmock.RegisterResponder("GET", url2, httpmock.NewStringResponder(200, res2))
+	httpmock.RegisterResponder("GET", url2, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(200, res2)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
 
-	c := NewClient()
 	q := Query{Text: "foo"}
 	ch := c.SearchAll(q)
 
-	expectedJson1 := AdaptiveJson{
+	expected1 := AdaptiveJson{
 		GlobalObjects: GlobalObjects{
 			Tweets: map[string]Tweet{
 				"1": Tweet{
@@ -351,22 +256,22 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 			},
 		},
 	}
-	actualJson1 := <-ch
-	if !reflect.DeepEqual(*actualJson1, expectedJson1) {
-		t.Errorf("Expect Client#SearchAll to send %+v first, but got %+v", expectedJson1, *actualJson1)
+	actual1 := <-ch
+	if !reflect.DeepEqual(*actual1, expected1) {
+		t.Errorf("Expect %+v first, got %+v", expected1, *actual1)
 		return
 	}
 
-	expectedJson2 := AdaptiveJson{}
-	actualJson2 := <-ch
-	if !reflect.DeepEqual(*actualJson2, expectedJson2) {
-		t.Errorf("Expect Client#SearchAll to send %+v second, but got %+v", expectedJson2, *actualJson2)
+	expected2 := AdaptiveJson{}
+	actual2 := <-ch
+	if !reflect.DeepEqual(*actual2, expected2) {
+		t.Errorf("Expect %+v second, got %+v", expected2, *actual2)
 		return
 	}
 
-	actualJson3 := <-ch
-	if actualJson3 != nil {
-		t.Errorf("Expect Client#SearchAll to send nil third, but got %+v", actualJson3)
+	actual3 := <-ch
+	if actual3 != nil {
+		t.Errorf("Expect nil third, got %+v", actual3)
 		return
 	}
 
@@ -374,17 +279,12 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 	info := httpmock.GetCallCountInfo()
 
 	if info["GET "+url1] != 1 {
-		t.Errorf("Expect Client#SearchAll to call %s once, but it called %d time(s)", url1, info["GET "+url1])
+		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url1, info["GET "+url1])
 		return
 	}
 
 	if info["GET "+url2] != 1 {
-		t.Errorf("Expect Client#SearchAll to call %s once, but it called %d time(s)", url2, info["GET "+url2])
-		return
-	}
-
-	if len(info) != 2 {
-		t.Errorf("Expect Client#SearchAll to call just 2 urls, but it called %d urls", len(info))
+		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url2, info["GET "+url2])
 		return
 	}
 }

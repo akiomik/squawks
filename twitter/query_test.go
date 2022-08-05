@@ -44,7 +44,7 @@ func TestEncode(t *testing.T) {
 			until:    "2020-09-07",
 			from:     "foo",
 			to:       "bar",
-			expected: "foo+bar+since%3A2020-09-06+until%3A2020-09-07+from%3Afoo+to%3Abar",
+			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar",
 		},
 	}
 
@@ -61,7 +61,7 @@ func TestEncode(t *testing.T) {
 			actual := q.Encode()
 
 			if actual != e.expected {
-				t.Errorf("Expect Query#Encode() = \"%s\", but got \"%s\"", e.expected, actual)
+				t.Errorf(`Expect "%s", got "%s"`, e.expected, actual)
 				return
 			}
 		})

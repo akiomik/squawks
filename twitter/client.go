@@ -15,103 +15,70 @@
 package twitter
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"net/url"
 	"os"
+
+	"github.com/go-resty/resty/v2"
 
 	"github.com/akiomik/get-old-tweets/config"
 )
 
 type Client struct {
-	Client     *http.Client
-	UserAgent  string
-	AuthToken  string
-	GuestToken string
+	Client    *resty.Client
+	UserAgent string
+	AuthToken string
 }
 
 func NewClient() *Client {
 	client := Client{}
-	client.Client = http.DefaultClient
+	client.Client = resty.New()
 	client.UserAgent = "get-old-tweets/" + config.Version
-	client.AuthToken = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
+	client.AuthToken = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
 	return &client
 }
 
-func (c *Client) Request(m string, u string) (*http.Response, error) {
-	req, err := http.NewRequest(m, u, nil)
-	if err != nil {
-		return nil, err
+func (c *Client) Request() *resty.Request {
+	client := c.Client.R().SetHeader("Accept", "application/json")
+
+	if len(c.AuthToken) != 0 {
+		client = client.SetAuthToken(c.AuthToken)
 	}
 
-	req.Header.Set("User-Agent", c.UserAgent)
-	req.Header.Set("Authorization", c.AuthToken)
-	if len(c.GuestToken) != 0 {
-		req.Header.Set("x-guest-token", c.GuestToken)
+	if len(c.UserAgent) != 0 {
+		client = client.SetHeader("User-Agent", c.UserAgent)
 	}
 
-	res, err := c.Client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
+	return client
 }
 
-func (c *Client) JsonRequest(m string, u string, v any) error {
-	res, err := c.Request(m, u)
-	if err != nil {
-		return err
+func (c *Client) Search(q Query, guestToken string, cursor string) (*AdaptiveJson, error) {
+	params := map[string]string{
+		"q":                   q.Encode(),
+		"include_quote_count": "true",
+		"include_reply_count": "1",
+		"tweet_mode":          "extended",
+		"count":               "40",
+		"query_source":        "typed_query",
+		"tweet_search_mode":   "live",
 	}
-	defer res.Body.Close()
-
-	blob, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(blob, v)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (c *Client) Search(q Query, cursor string) (*AdaptiveJson, error) {
-	u :=
-		"https://twitter.com/i/api/2/search/adaptive.json" +
-			"?q=" + q.Encode() +
-			"&include_quote_count=true" +
-			"&include_reply_count=1" +
-			"&tweet_mode=extended" +
-			"&count=40" +
-			"&query_source=typed_query" +
-			"&tweet_search_mode=live"
 
 	if len(cursor) != 0 {
-		u += "&cursor=" + url.QueryEscape(cursor)
+		params["cursor"] = cursor
 	}
 
-	res := new(AdaptiveJson)
-	err := c.JsonRequest("GET", u, res)
+	res, err := c.Request().
+		SetResult(AdaptiveJson{}).
+		SetError(AdaptiveJson{}).
+		SetHeader("x-guest-token", guestToken).
+		SetQueryParams(params).
+		Get("https://twitter.com/i/api/2/search/adaptive.json")
+
 	if err != nil {
 		return nil, err
 	}
 
-	if len(res.Errors) != 0 {
-		message := ""
-		for _, err := range res.Errors {
-			message += fmt.Sprintf("[%d] %s\n", err.Code, err.Message)
-		}
-
-		return res, fmt.Errorf("Error: %s", message)
-	}
-
-	return res, nil
+	return res.Result().(*AdaptiveJson), nil
 }
 
 func (c *Client) SearchAll(q Query) <-chan *AdaptiveJson {
@@ -121,8 +88,9 @@ func (c *Client) SearchAll(q Query) <-chan *AdaptiveJson {
 		defer close(ch)
 
 		cursor := ""
+		guestToken := ""
 		for {
-			res, err := c.Search(q, cursor)
+			res, err := c.Search(q, guestToken, cursor)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 				panic(err)

@@ -15,7 +15,6 @@
 package twitter
 
 import (
-	"net/url"
 	"strings"
 )
 
@@ -50,7 +49,7 @@ func (q *Query) Encode() string {
 		ss = append(ss, "to:"+q.To)
 	}
 
-	return url.QueryEscape(strings.Join(ss[:], " "))
+	return strings.Join(ss[:], " ")
 }
 
 func (q *Query) IsEmpty() bool {
