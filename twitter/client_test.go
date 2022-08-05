@@ -76,15 +76,20 @@ func TestSearchWhenWithoutCursor(t *testing.T) {
 	})
 
 	q := Query{Text: "foo"}
-	actual, err := c.Search(q, "", "")
+	success, failure, err := c.Search(q, "", "")
 	if err != nil {
 		t.Errorf("Expect Client#Search not to return error objects, but got %v", err)
 		return
 	}
 
+	if failure != nil {
+		t.Errorf("Expect nil, got %+v", failure)
+		return
+	}
+
 	expected := Adaptive{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
-	if !reflect.DeepEqual(*actual, expected) {
-		t.Errorf("Expect Client#Search to return %+v, but got %+v", expected, *actual)
+	if !reflect.DeepEqual(*success, expected) {
+		t.Errorf("Expect %+v, got %+v", expected, *success)
 		return
 	}
 
@@ -92,12 +97,7 @@ func TestSearchWhenWithoutCursor(t *testing.T) {
 	info := httpmock.GetCallCountInfo()
 
 	if info["GET "+url] != 1 {
-		t.Errorf("Expect Client#Search to call %s once, but it called %d time(s)", url, info["GET "+url])
-		return
-	}
-
-	if len(info) != 1 {
-		t.Errorf("Expect Client#Search to call %s only, but it called other urls too: %v", url, info)
+		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url, info["GET "+url])
 		return
 	}
 }
@@ -117,15 +117,20 @@ func TestSearchWhenWithCursor(t *testing.T) {
 	})
 
 	q := Query{Text: "foo"}
-	actual, err := c.Search(q, "", "scroll:deadbeef")
+	success, failure, err := c.Search(q, "", "scroll:deadbeef")
 	if err != nil {
-		t.Errorf("Expect Client#Search not to return error objects, but got %v", err)
+		t.Errorf("Expect not error objects, got %v", err)
+		return
+	}
+
+	if failure != nil {
+		t.Errorf("Expect nil, got %+v", failure)
 		return
 	}
 
 	expected := Adaptive{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
-	if !reflect.DeepEqual(*actual, expected) {
-		t.Errorf("Expect Client#Search to return %+v, but got %+v", expected, *actual)
+	if !reflect.DeepEqual(*success, expected) {
+		t.Errorf("Expect %+v, got %+v", expected, *success)
 		return
 	}
 
@@ -133,12 +138,48 @@ func TestSearchWhenWithCursor(t *testing.T) {
 	info := httpmock.GetCallCountInfo()
 
 	if info["GET "+url] != 1 {
-		t.Errorf("Expect Client#Search to call %s once, but it called %d time(s)", url, info["GET "+url])
+		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url, info["GET "+url])
+		return
+	}
+}
+
+func TestSearchWhenError(t *testing.T) {
+	c := NewClient()
+
+	httpmock.ActivateNonDefault(c.Client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	url := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
+	res := `{ "errors": [{ "code": 200, "message": "forbidden" }] }`
+	httpmock.RegisterResponder("GET", url, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(403, res)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
+
+	q := Query{Text: "foo"}
+	success, failure, err := c.Search(q, "", "")
+	if err != nil {
+		t.Errorf("Expect not error objects, got %v", err)
 		return
 	}
 
-	if len(info) != 1 {
-		t.Errorf("Expect Client#Search to call %s only, but it called other urls too: %v", url, info)
+	expectedFailure := ErrorResponse{Errors: []Error{Error{Code: 200, Message: "forbidden"}}}
+	if !reflect.DeepEqual(*failure, expectedFailure) {
+		t.Errorf("Expect %+v, got %+v", expectedFailure, *failure)
+		return
+	}
+
+	if success != nil {
+		t.Errorf("Expect nil, got %+v", success)
+		return
+	}
+
+	httpmock.GetTotalCallCount()
+	info := httpmock.GetCallCountInfo()
+
+	if info["GET "+url] != 1 {
+		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url, info["GET "+url])
 		return
 	}
 }

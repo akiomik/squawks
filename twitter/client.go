@@ -52,7 +52,7 @@ func (c *Client) Request() *resty.Request {
 	return client
 }
 
-func (c *Client) Search(q Query, guestToken string, cursor string) (*Adaptive, error) {
+func (c *Client) Search(q Query, guestToken string, cursor string) (*Adaptive, *ErrorResponse, error) {
 	params := map[string]string{
 		"q":                   q.Encode(),
 		"include_quote_count": "true",
@@ -69,16 +69,20 @@ func (c *Client) Search(q Query, guestToken string, cursor string) (*Adaptive, e
 
 	res, err := c.Request().
 		SetResult(Adaptive{}).
-		SetError(Adaptive{}).
+		SetError(ErrorResponse{}).
 		SetHeader("x-guest-token", guestToken).
 		SetQueryParams(params).
 		Get("https://twitter.com/i/api/2/search/adaptive.json")
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return res.Result().(*Adaptive), nil
+	if res.IsError() {
+		return nil, res.Error().(*ErrorResponse), nil
+	}
+
+	return res.Result().(*Adaptive), nil, nil
 }
 
 func (c *Client) SearchAll(q Query) <-chan *Adaptive {
@@ -90,7 +94,7 @@ func (c *Client) SearchAll(q Query) <-chan *Adaptive {
 		cursor := ""
 		guestToken := ""
 		for {
-			res, err := c.Search(q, guestToken, cursor)
+			res, _, err := c.Search(q, guestToken, cursor)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 				panic(err)

@@ -110,15 +110,9 @@ type Timeline struct {
 	Instructions []Instruction `json:"instructions"`
 }
 
-type Error struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
 type Adaptive struct {
 	GlobalObjects GlobalObjects `json:"globalObjects"`
 	Timeline      Timeline      `json:"timeline"`
-	Errors        []Error       `json:"errors"`
 }
 
 func (j *Adaptive) FindCursor() (string, error) {
