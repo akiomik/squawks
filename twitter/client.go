@@ -52,7 +52,7 @@ func (c *Client) Request() *resty.Request {
 	return client
 }
 
-func (c *Client) Search(q Query, guestToken string, cursor string) (*AdaptiveJson, error) {
+func (c *Client) Search(q Query, guestToken string, cursor string) (*Adaptive, error) {
 	params := map[string]string{
 		"q":                   q.Encode(),
 		"include_quote_count": "true",
@@ -68,8 +68,8 @@ func (c *Client) Search(q Query, guestToken string, cursor string) (*AdaptiveJso
 	}
 
 	res, err := c.Request().
-		SetResult(AdaptiveJson{}).
-		SetError(AdaptiveJson{}).
+		SetResult(Adaptive{}).
+		SetError(Adaptive{}).
 		SetHeader("x-guest-token", guestToken).
 		SetQueryParams(params).
 		Get("https://twitter.com/i/api/2/search/adaptive.json")
@@ -78,11 +78,11 @@ func (c *Client) Search(q Query, guestToken string, cursor string) (*AdaptiveJso
 		return nil, err
 	}
 
-	return res.Result().(*AdaptiveJson), nil
+	return res.Result().(*Adaptive), nil
 }
 
-func (c *Client) SearchAll(q Query) <-chan *AdaptiveJson {
-	ch := make(chan *AdaptiveJson)
+func (c *Client) SearchAll(q Query) <-chan *Adaptive {
+	ch := make(chan *Adaptive)
 
 	go func() {
 		defer close(ch)

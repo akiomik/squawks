@@ -23,7 +23,7 @@ import (
 	"github.com/akiomik/get-old-tweets/twitter"
 )
 
-func ExportCsv(f *os.File, ch <-chan *twitter.AdaptiveJson) <-chan struct{} {
+func ExportCsv(f *os.File, ch <-chan *twitter.Adaptive) <-chan struct{} {
 	done := make(chan struct{})
 
 	go func() {

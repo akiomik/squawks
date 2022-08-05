@@ -36,7 +36,7 @@ func TestExportCsvEmpty(t *testing.T) {
 	}
 	defer f.Close()
 
-	ch := make(chan *twitter.AdaptiveJson)
+	ch := make(chan *twitter.Adaptive)
 	close(ch)
 
 	done := ExportCsv(f, ch)
@@ -59,11 +59,11 @@ func TestExportCsvNonEmpty(t *testing.T) {
 	}
 	defer f.Close()
 
-	ch := make(chan *twitter.AdaptiveJson)
+	ch := make(chan *twitter.Adaptive)
 	go func() {
 		defer close(ch)
 
-		ch <- &twitter.AdaptiveJson{
+		ch <- &twitter.Adaptive{
 			GlobalObjects: twitter.GlobalObjects{
 				Tweets: map[string]twitter.Tweet{
 					"1000": twitter.Tweet{
@@ -104,7 +104,7 @@ func TestExportCsvNonEmpty(t *testing.T) {
 			},
 		}
 
-		ch <- &twitter.AdaptiveJson{
+		ch <- &twitter.Adaptive{
 			GlobalObjects: twitter.GlobalObjects{
 				Tweets: map[string]twitter.Tweet{
 					"10": twitter.Tweet{

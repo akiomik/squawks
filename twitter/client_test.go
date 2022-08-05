@@ -82,7 +82,7 @@ func TestSearchWhenWithoutCursor(t *testing.T) {
 		return
 	}
 
-	expected := AdaptiveJson{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
+	expected := Adaptive{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
 	if !reflect.DeepEqual(*actual, expected) {
 		t.Errorf("Expect Client#Search to return %+v, but got %+v", expected, *actual)
 		return
@@ -123,7 +123,7 @@ func TestSearchWhenWithCursor(t *testing.T) {
 		return
 	}
 
-	expected := AdaptiveJson{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
+	expected := Adaptive{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
 	if !reflect.DeepEqual(*actual, expected) {
 		t.Errorf("Expect Client#Search to return %+v, but got %+v", expected, *actual)
 		return
@@ -156,7 +156,7 @@ func TestSearchAllWhenRestTweetDoNotExist(t *testing.T) {
 	q := Query{Text: "foo"}
 	ch := c.SearchAll(q)
 
-	expected1 := AdaptiveJson{}
+	expected1 := Adaptive{}
 	actual1 := <-ch
 	if !reflect.DeepEqual(*actual1, expected1) {
 		t.Errorf("Expect %+v first, got %+v", expected1, *actual1)
@@ -227,7 +227,7 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 	q := Query{Text: "foo"}
 	ch := c.SearchAll(q)
 
-	expected1 := AdaptiveJson{
+	expected1 := Adaptive{
 		GlobalObjects: GlobalObjects{
 			Tweets: map[string]Tweet{
 				"1": Tweet{
@@ -262,7 +262,7 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 		return
 	}
 
-	expected2 := AdaptiveJson{}
+	expected2 := Adaptive{}
 	actual2 := <-ch
 	if !reflect.DeepEqual(*actual2, expected2) {
 		t.Errorf("Expect %+v second, got %+v", expected2, *actual2)

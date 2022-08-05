@@ -115,13 +115,13 @@ type Error struct {
 	Message string `json:"message"`
 }
 
-type AdaptiveJson struct {
+type Adaptive struct {
 	GlobalObjects GlobalObjects `json:"globalObjects"`
 	Timeline      Timeline      `json:"timeline"`
 	Errors        []Error       `json:"errors"`
 }
 
-func (j *AdaptiveJson) FindCursor() (string, error) {
+func (j *Adaptive) FindCursor() (string, error) {
 	for _, i := range j.Timeline.Instructions {
 		if i.ReplaceEntry.EntryIdToReplace == "sq-cursor-bottom" {
 			return i.ReplaceEntry.Entry.Content.Operation.Cursor.Value, nil

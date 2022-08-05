@@ -22,7 +22,7 @@ import (
 )
 
 func TestFindCursorWhenReplaceEntryExists(t *testing.T) {
-	j := AdaptiveJson{
+	j := Adaptive{
 		Timeline: Timeline{
 			Instructions: []Instruction{
 				Instruction{
@@ -62,18 +62,18 @@ func TestFindCursorWhenReplaceEntryExists(t *testing.T) {
 	expected := "scroll:foobar"
 	actual, err := j.FindCursor()
 	if err != nil {
-		t.Errorf("Expect AdaptiveJson#FindCursor() not to return error object, but got \"%v\"", err)
+		t.Errorf(`Expect not error object, got "%v"`, err)
 		return
 	}
 
 	if actual != expected {
-		t.Errorf("Expect AdaptiveJson#FindCursor() = \"%s\", but got \"%s\"", expected, actual)
+		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
 		return
 	}
 }
 
 func TestFindCursorWhenAddEntriesExist(t *testing.T) {
-	j := AdaptiveJson{
+	j := Adaptive{
 		Timeline: Timeline{
 			Instructions: []Instruction{
 				Instruction{
@@ -109,22 +109,22 @@ func TestFindCursorWhenAddEntriesExist(t *testing.T) {
 	expected := "scroll:foobar"
 	actual, err := j.FindCursor()
 	if err != nil {
-		t.Errorf("Expect AdaptiveJson#FindCursor() not to return error object, but got \"%v\"", err)
+		t.Errorf(`Expect not error object, got "%v"`, err)
 		return
 	}
 
 	if actual != expected {
-		t.Errorf("Expect AdaptiveJson#FindCursor() = \"%s\", but got \"%s\"", expected, actual)
+		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
 		return
 	}
 }
 
 func TestFindCursorWhenNoCursorFound(t *testing.T) {
-	j := AdaptiveJson{}
+	j := Adaptive{}
 
 	_, err := j.FindCursor()
 	if err == nil {
-		t.Errorf("Expect AdaptiveJson#FindCursor() to return error object, but got nil")
+		t.Errorf("Expect error object, got nil")
 		return
 	}
 }
