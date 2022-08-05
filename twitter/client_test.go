@@ -25,6 +25,7 @@ import (
 	"github.com/jarcoal/httpmock"
 
 	"github.com/akiomik/get-old-tweets/config"
+	"github.com/akiomik/get-old-tweets/twitter/json"
 )
 
 func TestNewClient(t *testing.T) {
@@ -82,7 +83,7 @@ func TestSearchWhenWithoutCursor(t *testing.T) {
 		return
 	}
 
-	expected := Adaptive{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
+	expected := json.Adaptive{GlobalObjects: json.GlobalObjects{Tweets: map[string]json.Tweet{}, Users: map[string]json.User{}}}
 	if !reflect.DeepEqual(*actual, expected) {
 		t.Errorf("Expect %+v, got %+v", expected, *actual)
 		return
@@ -118,7 +119,7 @@ func TestSearchWhenWithCursor(t *testing.T) {
 		return
 	}
 
-	expected := Adaptive{GlobalObjects: GlobalObjects{Tweets: map[string]Tweet{}, Users: map[string]User{}}}
+	expected := json.Adaptive{GlobalObjects: json.GlobalObjects{Tweets: map[string]json.Tweet{}, Users: map[string]json.User{}}}
 	if !reflect.DeepEqual(*actual, expected) {
 		t.Errorf("Expect %+v, got %+v", expected, *actual)
 		return
@@ -150,8 +151,8 @@ func TestSearchWhenError(t *testing.T) {
 	q := Query{Text: "foo"}
 	actualAdaptive, err := c.Search(q, "", "")
 
-	expectedError := ErrorResponse{Errors: []Error{Error{Code: 200, Message: "forbidden"}}}
-  actualError, ok := err.(*ErrorResponse)
+	expectedError := json.ErrorResponse{Errors: []json.Error{json.Error{Code: 200, Message: "forbidden"}}}
+	actualError, ok := err.(*json.ErrorResponse)
 	if !ok || !reflect.DeepEqual(*actualError, expectedError) {
 		t.Errorf("Expect %+v, got %+v", expectedError, *actualError)
 		return
@@ -184,7 +185,7 @@ func TestSearchAllWhenRestTweetDoNotExist(t *testing.T) {
 	q := Query{Text: "foo"}
 	ch := c.SearchAll(q)
 
-	expected1 := Adaptive{}
+	expected1 := json.Adaptive{}
 	actual1 := <-ch
 	if !reflect.DeepEqual(*actual1, expected1) {
 		t.Errorf("Expect %+v first, got %+v", expected1, *actual1)
@@ -255,26 +256,26 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 	q := Query{Text: "foo"}
 	ch := c.SearchAll(q)
 
-	expected1 := Adaptive{
-		GlobalObjects: GlobalObjects{
-			Tweets: map[string]Tweet{
-				"1": Tweet{
+	expected1 := json.Adaptive{
+		GlobalObjects: json.GlobalObjects{
+			Tweets: map[string]json.Tweet{
+				"1": json.Tweet{
 					Id:       1,
 					FullText: "To Sherlock Holmes she is always the woman.",
 				},
 			},
-			Users: map[string]User{},
+			Users: map[string]json.User{},
 		},
-		Timeline: Timeline{
-			Instructions: []Instruction{
-				Instruction{
-					AddEntries: AddEntries{
-						Entries: []Entry{
-							Entry{
+		Timeline: json.Timeline{
+			Instructions: []json.Instruction{
+				json.Instruction{
+					AddEntries: json.AddEntries{
+						Entries: []json.Entry{
+							json.Entry{
 								EntryId: "sq-cursor-bottom",
-								Content: Content{
-									Operation: Operation{
-										Cursor: Cursor{Value: "scroll:deadbeef", CursorType: "Bottom"},
+								Content: json.Content{
+									Operation: json.Operation{
+										Cursor: json.Cursor{Value: "scroll:deadbeef", CursorType: "Bottom"},
 									},
 								},
 							},
@@ -290,7 +291,7 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 		return
 	}
 
-	expected2 := Adaptive{}
+	expected2 := json.Adaptive{}
 	actual2 := <-ch
 	if !reflect.DeepEqual(*actual2, expected2) {
 		t.Errorf("Expect %+v second, got %+v", expected2, *actual2)

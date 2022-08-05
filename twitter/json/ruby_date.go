@@ -12,26 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package twitter
+package json
 
 import (
-  "fmt"
+	"bytes"
+	"time"
 )
 
-type Error struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
+type RubyDate time.Time
+
+func (t *RubyDate) Iso8601() string {
+	return time.Time(*t).Format("2006-01-02T15:04:05-07:00")
 }
 
-type ErrorResponse struct {
-	Errors []Error `json:"errors"`
+func (t *RubyDate) String() string {
+	return time.Time(*t).Format(time.RubyDate)
 }
 
-func (res *ErrorResponse) Error() string {
-  message := ""
-  for _, e := range res.Errors {
-    message += fmt.Sprintf("%d: %s\n", e.Code, e.Message)
-  }
+func (t *RubyDate) Equal(u RubyDate) bool {
+	return time.Time(*t).Equal(time.Time(u))
+}
 
-  return message
+func (t *RubyDate) UnmarshalJSON(buf []byte) error {
+	s := bytes.Trim(buf, `"`)
+	parsed, err := time.ParseInLocation(time.RubyDate, string(s), time.UTC)
+	if err != nil {
+		return err
+	}
+
+	*t = RubyDate(parsed)
+	return nil
 }

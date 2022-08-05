@@ -21,6 +21,7 @@ import (
 	"github.com/go-resty/resty/v2"
 
 	"github.com/akiomik/get-old-tweets/config"
+	"github.com/akiomik/get-old-tweets/twitter/json"
 )
 
 type Client struct {
@@ -52,7 +53,7 @@ func (c *Client) Request() *resty.Request {
 	return client
 }
 
-func (c *Client) Search(q Query, guestToken string, cursor string) (*Adaptive, error) {
+func (c *Client) Search(q Query, guestToken string, cursor string) (*json.Adaptive, error) {
 	params := map[string]string{
 		"q":                   q.Encode(),
 		"include_quote_count": "true",
@@ -68,8 +69,8 @@ func (c *Client) Search(q Query, guestToken string, cursor string) (*Adaptive, e
 	}
 
 	res, err := c.Request().
-		SetResult(Adaptive{}).
-		SetError(ErrorResponse{}).
+		SetResult(json.Adaptive{}).
+		SetError(json.ErrorResponse{}).
 		SetHeader("x-guest-token", guestToken).
 		SetQueryParams(params).
 		Get("https://twitter.com/i/api/2/search/adaptive.json")
@@ -79,14 +80,14 @@ func (c *Client) Search(q Query, guestToken string, cursor string) (*Adaptive, e
 	}
 
 	if res.IsError() {
-		return nil, res.Error().(*ErrorResponse)
+		return nil, res.Error().(*json.ErrorResponse)
 	}
 
-	return res.Result().(*Adaptive), nil
+	return res.Result().(*json.Adaptive), nil
 }
 
-func (c *Client) SearchAll(q Query) <-chan *Adaptive {
-	ch := make(chan *Adaptive)
+func (c *Client) SearchAll(q Query) <-chan *json.Adaptive {
+	ch := make(chan *json.Adaptive)
 
 	go func() {
 		defer close(ch)

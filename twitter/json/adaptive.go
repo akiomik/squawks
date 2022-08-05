@@ -12,60 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package twitter
+package json
 
 import (
 	"fmt"
 )
-
-type BoundingBox struct {
-	Type       string        `json:"type"`
-	Coodinates [][][]float64 `json:"coordinates"`
-}
-
-type Place struct {
-	Id          string      `json:"id"`
-	Url         string      `json:"url"`
-	PlaceType   string      `json:"place_type"`
-	Name        string      `json:"name"`
-	FullName    string      `json:"full_name"`
-	CountryCode string      `json:"country_code"`
-	Country     string      `json:"country"`
-	BoundingBox BoundingBox `json:"bounding_box"`
-}
-
-type Tweet struct {
-	Id            uint64   `json:"id"`
-	UserId        uint64   `json:"user_id"`
-	FullText      string   `json:"full_text"`
-	RetweetCount  uint64   `json:"retweet_count"`
-	FavoriteCount uint64   `json:"favorite_count"`
-	ReplyCount    uint64   `json:"reply_count"`
-	QuoteCount    uint64   `json:"quote_count"`
-	Geo           string   `json:"geo"`
-	Coodinates    string   `json:"coordinates"`
-	Place         Place    `json:"place"`
-	Lang          string   `json:"lang"`
-	Source        string   `json:"source"`
-	CreatedAt     RubyDate `json:"created_at"`
-}
-
-type User struct {
-	Id              uint64   `json:"id"`
-	Name            string   `json:"name"`
-	ScreenName      string   `json:"screen_name"`
-	Location        string   `json:"location"`
-	Description     string   `json:"description"`
-	Url             string   `json:"url"`
-	FollowersCount  uint64   `json:"followers_count"`
-	FriendsCount    uint64   `json:"friends_count"`
-	ListedCount     uint64   `json:"listed_count"`
-	FavouritesCount uint64   `json:"favourites_count"`
-	StatusesCount   uint64   `json:"statuses_count"`
-	MediaCount      uint64   `json:"media_count"`
-	Verified        bool     `json:"verified"`
-	CreatedAt       RubyDate `json:"created_at"`
-}
 
 type GlobalObjects struct {
 	Tweets map[string]Tweet `json:"tweets"`

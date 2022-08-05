@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/akiomik/get-old-tweets/twitter"
+	"github.com/akiomik/get-old-tweets/twitter/json"
 )
 
 func TestContains(t *testing.T) {
@@ -61,13 +61,13 @@ func TestContains(t *testing.T) {
 }
 
 func TestKeysOf(t *testing.T) {
-	m := map[string]twitter.Tweet{
-		"z":  twitter.Tweet{},
-		"zz": twitter.Tweet{},
-		"a":  twitter.Tweet{},
-		"c":  twitter.Tweet{},
-		"c1": twitter.Tweet{},
-		"c0": twitter.Tweet{},
+	m := map[string]json.Tweet{
+		"z":  json.Tweet{},
+		"zz": json.Tweet{},
+		"a":  json.Tweet{},
+		"c":  json.Tweet{},
+		"c1": json.Tweet{},
+		"c0": json.Tweet{},
 	}
 
 	ks := KeysOf(m)
@@ -86,13 +86,13 @@ func TestKeysOf(t *testing.T) {
 }
 
 func TestReversedKeysOf(t *testing.T) {
-	m := map[string]twitter.Tweet{
-		"z":  twitter.Tweet{},
-		"zz": twitter.Tweet{},
-		"a":  twitter.Tweet{},
-		"c":  twitter.Tweet{},
-		"c1": twitter.Tweet{},
-		"c0": twitter.Tweet{},
+	m := map[string]json.Tweet{
+		"z":  json.Tweet{},
+		"zz": json.Tweet{},
+		"a":  json.Tweet{},
+		"c":  json.Tweet{},
+		"c1": json.Tweet{},
+		"c0": json.Tweet{},
 	}
 
 	expected := []string{

@@ -20,10 +20,10 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/akiomik/get-old-tweets/twitter"
+	"github.com/akiomik/get-old-tweets/twitter/json"
 )
 
-func ExportCsv(f *os.File, ch <-chan *twitter.Adaptive) <-chan struct{} {
+func ExportCsv(f *os.File, ch <-chan *json.Adaptive) <-chan struct{} {
 	done := make(chan struct{})
 
 	go func() {

@@ -25,7 +25,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/akiomik/get-old-tweets/twitter"
+	"github.com/akiomik/get-old-tweets/twitter/json"
 )
 
 func TestExportCsvEmpty(t *testing.T) {
@@ -36,7 +36,7 @@ func TestExportCsvEmpty(t *testing.T) {
 	}
 	defer f.Close()
 
-	ch := make(chan *twitter.Adaptive)
+	ch := make(chan *json.Adaptive)
 	close(ch)
 
 	done := ExportCsv(f, ch)
@@ -59,17 +59,17 @@ func TestExportCsvNonEmpty(t *testing.T) {
 	}
 	defer f.Close()
 
-	ch := make(chan *twitter.Adaptive)
+	ch := make(chan *json.Adaptive)
 	go func() {
 		defer close(ch)
 
-		ch <- &twitter.Adaptive{
-			GlobalObjects: twitter.GlobalObjects{
-				Tweets: map[string]twitter.Tweet{
-					"1000": twitter.Tweet{
+		ch <- &json.Adaptive{
+			GlobalObjects: json.GlobalObjects{
+				Tweets: map[string]json.Tweet{
+					"1000": json.Tweet{
 						Id:            1000,
 						UserId:        2000,
-						CreatedAt:     twitter.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+						CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
 						FullText:      "To Sherlock Holmes she is always the woman.",
 						RetweetCount:  3000,
 						FavoriteCount: 4000,
@@ -77,10 +77,10 @@ func TestExportCsvNonEmpty(t *testing.T) {
 						QuoteCount:    6000,
 						Lang:          "en",
 					},
-					"100": twitter.Tweet{
+					"100": json.Tweet{
 						Id:            100,
 						UserId:        200,
-						CreatedAt:     twitter.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+						CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
 						FullText:      "To Sherlock Holmes she is always the woman.",
 						RetweetCount:  300,
 						FavoriteCount: 400,
@@ -89,13 +89,13 @@ func TestExportCsvNonEmpty(t *testing.T) {
 						Lang:          "en",
 					},
 				},
-				Users: map[string]twitter.User{
-					"2000": twitter.User{
+				Users: map[string]json.User{
+					"2000": json.User{
 						Id:         2000,
 						Name:       "Watson",
 						ScreenName: "watson",
 					},
-					"200": twitter.User{
+					"200": json.User{
 						Id:         200,
 						Name:       "Watson",
 						ScreenName: "watson",
@@ -104,13 +104,13 @@ func TestExportCsvNonEmpty(t *testing.T) {
 			},
 		}
 
-		ch <- &twitter.Adaptive{
-			GlobalObjects: twitter.GlobalObjects{
-				Tweets: map[string]twitter.Tweet{
-					"10": twitter.Tweet{
+		ch <- &json.Adaptive{
+			GlobalObjects: json.GlobalObjects{
+				Tweets: map[string]json.Tweet{
+					"10": json.Tweet{
 						Id:            10,
 						UserId:        20,
-						CreatedAt:     twitter.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+						CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
 						FullText:      "To Sherlock Holmes she is always the woman.",
 						RetweetCount:  30,
 						FavoriteCount: 40,
@@ -118,10 +118,10 @@ func TestExportCsvNonEmpty(t *testing.T) {
 						QuoteCount:    60,
 						Lang:          "en",
 					},
-					"1": twitter.Tweet{
+					"1": json.Tweet{
 						Id:            1,
 						UserId:        2,
-						CreatedAt:     twitter.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+						CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
 						FullText:      "To Sherlock Holmes she is always the woman.",
 						RetweetCount:  3,
 						FavoriteCount: 4,
@@ -130,13 +130,13 @@ func TestExportCsvNonEmpty(t *testing.T) {
 						Lang:          "en",
 					},
 				},
-				Users: map[string]twitter.User{
-					"2": twitter.User{
+				Users: map[string]json.User{
+					"2": json.User{
 						Id:         2,
 						Name:       "Watson",
 						ScreenName: "watson",
 					},
-					"20": twitter.User{
+					"20": json.User{
 						Id:         20,
 						Name:       "Watson",
 						ScreenName: "watson",

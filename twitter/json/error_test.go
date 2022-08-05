@@ -12,38 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package export
+//go:build small
+// +build small
+
+package json
 
 import (
-	"sort"
-
-	"github.com/akiomik/get-old-tweets/twitter/json"
+	"testing"
 )
 
-func Contains(ss []string, needle string) bool {
-	for _, s := range ss {
-		if s == needle {
-			return true
-		}
+func TestError(t *testing.T) {
+	err := ErrorResponse{
+		Errors: []Error{
+			Error{Code: 200, Message: "forbidden"},
+		},
 	}
 
-	return false
-}
-
-func KeysOf(m map[string]json.Tweet) []string {
-	keys := make([]string, len(m))
-
-	i := 0
-	for k := range m {
-		keys[i] = k
-		i++
+	expected := "200: forbidden\n"
+	actual := err.Error()
+	if actual != expected {
+		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
 	}
-
-	return keys
-}
-
-func ReversedKeysOf(m map[string]json.Tweet) []string {
-	ks := KeysOf(m)
-	sort.Sort(sort.Reverse(sort.StringSlice(ks)))
-	return ks
 }
