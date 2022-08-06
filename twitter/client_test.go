@@ -238,10 +238,15 @@ func TestSearchAllWhenRestTweetDoNotExist(t *testing.T) {
 	q := Query{Text: "foo"}
 	ch := c.SearchAll(q)
 
-	expected1 := json.Adaptive{}
 	actual1 := <-ch
-	if !reflect.DeepEqual(*actual1, expected1) {
-		t.Errorf("Expect %+v first, got %+v", expected1, *actual1)
+	if actual1.Error != nil {
+		t.Errorf("Expect nil, got %+v", actual1.Error)
+		return
+	}
+
+	expected1 := &json.Adaptive{}
+	if !reflect.DeepEqual(actual1.Adaptive, expected1) {
+		t.Errorf("Expect %+v first, got %+v", expected1, actual1.Adaptive)
 		return
 	}
 
@@ -309,7 +314,13 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 	q := Query{Text: "foo"}
 	ch := c.SearchAll(q)
 
-	expected1 := json.Adaptive{
+	actual1 := <-ch
+	if actual1.Error != nil {
+		t.Errorf("Expect nil, got %+v", actual1.Error)
+		return
+	}
+
+	expected1 := &json.Adaptive{
 		GlobalObjects: json.GlobalObjects{
 			Tweets: map[string]json.Tweet{
 				"1": json.Tweet{
@@ -338,16 +349,20 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 			},
 		},
 	}
-	actual1 := <-ch
-	if !reflect.DeepEqual(*actual1, expected1) {
-		t.Errorf("Expect %+v first, got %+v", expected1, *actual1)
+	if !reflect.DeepEqual(actual1.Adaptive, expected1) {
+		t.Errorf("Expect %+v first, got %+v", expected1, actual1.Adaptive)
 		return
 	}
 
-	expected2 := json.Adaptive{}
 	actual2 := <-ch
-	if !reflect.DeepEqual(*actual2, expected2) {
-		t.Errorf("Expect %+v second, got %+v", expected2, *actual2)
+	if actual2.Error != nil {
+		t.Errorf("Expect nil, got %+v", actual2.Error)
+		return
+	}
+
+	expected2 := &json.Adaptive{}
+	if !reflect.DeepEqual(actual2.Adaptive, expected2) {
+		t.Errorf("Expect %+v second, got %+v", expected2, actual2.Adaptive)
 		return
 	}
 

@@ -21,6 +21,7 @@ import (
 	"github.com/akiomik/get-old-tweets/config"
 	"github.com/akiomik/get-old-tweets/export"
 	"github.com/akiomik/get-old-tweets/twitter"
+	"github.com/akiomik/get-old-tweets/twitter/json"
 	"github.com/spf13/cobra"
 )
 
@@ -63,10 +64,21 @@ var rootCmd = &cobra.Command{
 			client.UserAgent = userAgent
 		}
 
-		input := client.SearchAll(q)
-		done := export.ExportCsv(f, input)
+		ch := make(chan *json.Adaptive)
+		go func() {
+			defer close(ch)
 
-		<-done
+			for res := range client.SearchAll(q) {
+				if res.Error != nil {
+					fmt.Fprintln(os.Stderr, "Error: %w", res.Error)
+					os.Exit(1)
+				}
+
+				ch <- res.Adaptive
+			}
+		}()
+
+		<-export.ExportCsv(f, ch)
 	},
 }
 

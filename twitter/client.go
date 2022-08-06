@@ -16,7 +16,6 @@ package twitter
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/go-resty/resty/v2"
 
@@ -103,8 +102,13 @@ func (c *Client) Search(q Query, guestToken string, cursor string) (*json.Adapti
 	return res.Result().(*json.Adaptive), nil
 }
 
-func (c *Client) SearchAll(q Query) <-chan *json.Adaptive {
-	ch := make(chan *json.Adaptive)
+type SearchResult struct {
+	Adaptive *json.Adaptive
+	Error    error
+}
+
+func (c *Client) SearchAll(q Query) <-chan *SearchResult {
+	ch := make(chan *SearchResult)
 
 	go func() {
 		defer close(ch)
@@ -114,19 +118,19 @@ func (c *Client) SearchAll(q Query) <-chan *json.Adaptive {
 		for {
 			res, err := c.Search(q, guestToken, cursor)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-				panic(err)
+				ch <- &SearchResult{nil, fmt.Errorf("Failed to search: %w", err)}
+				break
 			}
 
-			ch <- res
+			ch <- &SearchResult{res, nil}
 			if len(res.GlobalObjects.Tweets) == 0 {
 				break
 			}
 
 			cursor, err = res.FindCursor()
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-				panic(err)
+				ch <- &SearchResult{nil, fmt.Errorf("Failed to find cursor: %w", err)}
+				break
 			}
 		}
 	}()
