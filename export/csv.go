@@ -19,11 +19,9 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-
-	"github.com/akiomik/get-old-tweets/twitter/json"
 )
 
-func ExportCsv(f *os.File, ch <-chan *json.Adaptive) <-chan struct{} {
+func ExportCsv(f *os.File, ch <-chan []Record) <-chan struct{} {
 	done := make(chan struct{})
 
 	go func() {
@@ -36,26 +34,24 @@ func ExportCsv(f *os.File, ch <-chan *json.Adaptive) <-chan struct{} {
 			panic(err)
 		}
 
-		for j := range ch {
-			for _, k := range ReversedKeysOf(j.GlobalObjects.Tweets) {
-				t := j.GlobalObjects.Tweets[k]
-				u := j.GlobalObjects.Users[strconv.FormatUint(t.UserId, 10)]
-				r := []string{
-					strconv.FormatUint(t.Id, 10),
-					u.ScreenName,
-					t.CreatedAt.Iso8601(),
-					t.FullText,
-					strconv.FormatUint(t.RetweetCount, 10),
-					strconv.FormatUint(t.FavoriteCount, 10),
-					strconv.FormatUint(t.ReplyCount, 10),
-					strconv.FormatUint(t.QuoteCount, 10),
-					t.Geo,
-					t.Coodinates,
-					t.Lang,
-					t.Source,
+		for records := range ch {
+			for _, record := range records {
+				row := []string{
+					strconv.FormatUint(record.Id, 10),
+					record.Username,
+					record.CreatedAt.Iso8601(),
+					record.FullText,
+					strconv.FormatUint(record.RetweetCount, 10),
+					strconv.FormatUint(record.FavoriteCount, 10),
+					strconv.FormatUint(record.ReplyCount, 10),
+					strconv.FormatUint(record.QuoteCount, 10),
+					record.Geo,
+					record.Coodinates,
+					record.Lang,
+					record.Source,
 				}
 
-				err = w.Write(r)
+				err = w.Write(row)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 					panic(err)

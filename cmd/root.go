@@ -21,7 +21,6 @@ import (
 	"github.com/akiomik/get-old-tweets/config"
 	"github.com/akiomik/get-old-tweets/export"
 	"github.com/akiomik/get-old-tweets/twitter"
-	"github.com/akiomik/get-old-tweets/twitter/json"
 	"github.com/spf13/cobra"
 )
 
@@ -68,7 +67,7 @@ var rootCmd = &cobra.Command{
 			client.UserAgent = userAgent
 		}
 
-		ch := make(chan *json.Adaptive)
+		ch := make(chan []export.Record)
 		go func() {
 			defer close(ch)
 
@@ -78,7 +77,7 @@ var rootCmd = &cobra.Command{
 					os.Exit(1)
 				}
 
-				ch <- res.Adaptive
+				ch <- export.NewRecordsFromAdaptive(res.Adaptive)
 			}
 		}()
 

@@ -36,7 +36,7 @@ func TestExportCsvEmpty(t *testing.T) {
 	}
 	defer f.Close()
 
-	ch := make(chan *json.Adaptive)
+	ch := make(chan []Record)
 	close(ch)
 
 	done := ExportCsv(f, ch)
@@ -59,92 +59,60 @@ func TestExportCsvNonEmpty(t *testing.T) {
 	}
 	defer f.Close()
 
-	ch := make(chan *json.Adaptive)
+	ch := make(chan []Record)
 	go func() {
 		defer close(ch)
 
-		ch <- &json.Adaptive{
-			GlobalObjects: json.GlobalObjects{
-				Tweets: map[string]json.Tweet{
-					"1000": json.Tweet{
-						Id:            1000,
-						UserId:        2000,
-						CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
-						FullText:      "To Sherlock Holmes she is always the woman.",
-						RetweetCount:  3000,
-						FavoriteCount: 4000,
-						ReplyCount:    5000,
-						QuoteCount:    6000,
-						Lang:          "en",
-					},
-					"100": json.Tweet{
-						Id:            100,
-						UserId:        200,
-						CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
-						FullText:      "To Sherlock Holmes she is always the woman.",
-						RetweetCount:  300,
-						FavoriteCount: 400,
-						ReplyCount:    500,
-						QuoteCount:    600,
-						Lang:          "en",
-					},
-				},
-				Users: map[string]json.User{
-					"2000": json.User{
-						Id:         2000,
-						Name:       "Watson",
-						ScreenName: "watson",
-					},
-					"200": json.User{
-						Id:         200,
-						Name:       "Watson",
-						ScreenName: "watson",
-					},
-				},
-			},
-		}
+		ch <- []Record{
+      Record{
+        Id:            1000,
+        Username:      "watson1",
+        CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+        FullText:      "To Sherlock Holmes she is always the woman.",
+        RetweetCount:  3000,
+        FavoriteCount: 4000,
+        ReplyCount:    5000,
+        QuoteCount:    6000,
+        Lang:          "en",
+      },
+      Record{
+        Id:            100,
+        Username:      "watson2",
+        CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+        FullText:      "To Sherlock Holmes she is always the woman.",
+        RetweetCount:  300,
+        FavoriteCount: 400,
+        ReplyCount:    500,
+        QuoteCount:    600,
+        Lang:          "en",
+      },
+    }
 
-		ch <- &json.Adaptive{
-			GlobalObjects: json.GlobalObjects{
-				Tweets: map[string]json.Tweet{
-					"10": json.Tweet{
-						Id:            10,
-						UserId:        20,
-						CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
-						FullText:      "To Sherlock Holmes she is always the woman.",
-						RetweetCount:  30,
-						FavoriteCount: 40,
-						ReplyCount:    50,
-						QuoteCount:    60,
-						Lang:          "en",
-					},
-					"1": json.Tweet{
-						Id:            1,
-						UserId:        2,
-						CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
-						FullText:      "To Sherlock Holmes she is always the woman.",
-						RetweetCount:  3,
-						FavoriteCount: 4,
-						ReplyCount:    5,
-						QuoteCount:    6,
-						Lang:          "en",
-					},
-				},
-				Users: map[string]json.User{
-					"2": json.User{
-						Id:         2,
-						Name:       "Watson",
-						ScreenName: "watson",
-					},
-					"20": json.User{
-						Id:         20,
-						Name:       "Watson",
-						ScreenName: "watson",
-					},
-				},
-			},
-		}
-	}()
+    ch <- []Record{
+      Record{
+        Id:            10,
+        Username:      "watson3",
+        CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+        FullText:      "To Sherlock Holmes she is always the woman.",
+        RetweetCount:  30,
+        FavoriteCount: 40,
+        ReplyCount:    50,
+        QuoteCount:    60,
+        Lang:          "en",
+      },
+      Record{
+        Id:            1,
+        Username:      "watson4",
+        CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+        FullText:      "To Sherlock Holmes she is always the woman.",
+        RetweetCount:  3,
+        FavoriteCount: 4,
+        ReplyCount:    5,
+        QuoteCount:    6,
+        Lang:          "en",
+      },
+    }
+  }()
 
 	done := ExportCsv(f, ch)
 	<-done
@@ -164,10 +132,10 @@ func TestExportCsvNonEmpty(t *testing.T) {
 	}
 
 	expectedRecords := [][]string{
-		[]string{"1000", "watson", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "3000", "4000", "5000", "6000", "", "", "en", ""},
-		[]string{"100", "watson", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "300", "400", "500", "600", "", "", "en", ""},
-		[]string{"10", "watson", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "30", "40", "50", "60", "", "", "en", ""},
-		[]string{"1", "watson", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "3", "4", "5", "6", "", "", "en", ""},
+		[]string{"1000", "watson1", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "3000", "4000", "5000", "6000", "", "", "en", ""},
+		[]string{"100", "watson2", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "300", "400", "500", "600", "", "", "en", ""},
+		[]string{"10", "watson3", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "30", "40", "50", "60", "", "", "en", ""},
+		[]string{"1", "watson4", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "3", "4", "5", "6", "", "", "en", ""},
 	}
 
 	for i, expectedRecord := range expectedRecords {
