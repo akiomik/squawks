@@ -39,7 +39,7 @@ func ExportCsv(f *os.File, ch <-chan []Record) <-chan struct{} {
 				row := []string{
 					strconv.FormatUint(record.Id, 10),
 					record.Username,
-					record.CreatedAt.Iso8601(),
+					record.CreatedAt.String(),
 					record.FullText,
 					strconv.FormatUint(record.RetweetCount, 10),
 					strconv.FormatUint(record.FavoriteCount, 10),

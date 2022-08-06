@@ -37,16 +37,6 @@ func TestString(t *testing.T) {
 	}
 }
 
-func TestIso8601(t *testing.T) {
-	d := RubyDate(time.Date(2013, 8, 19, 2, 4, 28, 0, time.UTC))
-	expected := "2013-08-19T02:04:28+00:00"
-	actual := d.Iso8601()
-	if actual != expected {
-		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
-		return
-	}
-}
-
 func TestEqual(t *testing.T) {
 	examples := map[string]struct {
 		this     RubyDate

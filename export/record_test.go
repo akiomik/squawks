@@ -68,7 +68,7 @@ func TestNewRecordsFromAdaptive(t *testing.T) {
 		Record{
 			Id:            1000,
 			Username:      "watson1",
-			CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+			CreatedAt:     Iso8601Date(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
 			FullText:      "To Sherlock Holmes she is always the woman.",
 			RetweetCount:  3000,
 			FavoriteCount: 4000,
@@ -79,7 +79,7 @@ func TestNewRecordsFromAdaptive(t *testing.T) {
 		Record{
 			Id:            100,
 			Username:      "watson2",
-			CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+			CreatedAt:     Iso8601Date(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
 			FullText:      "To Sherlock Holmes she is always the woman.",
 			RetweetCount:  300,
 			FavoriteCount: 400,

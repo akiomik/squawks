@@ -16,6 +16,7 @@ package export
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/akiomik/get-old-tweets/twitter/json"
 )
@@ -23,7 +24,7 @@ import (
 type Record struct {
 	Id            uint64
 	Username      string
-	CreatedAt     json.RubyDate
+	CreatedAt     Iso8601Date
 	FullText      string
 	RetweetCount  uint64
 	FavoriteCount uint64
@@ -44,7 +45,7 @@ func NewRecordsFromAdaptive(j *json.Adaptive) []Record {
 		l[i] = Record{
 			Id:            t.Id,
 			Username:      u.ScreenName,
-			CreatedAt:     t.CreatedAt,
+			CreatedAt:     Iso8601Date(time.Time(t.CreatedAt)),
 			FullText:      t.FullText,
 			RetweetCount:  t.RetweetCount,
 			FavoriteCount: t.FavoriteCount,

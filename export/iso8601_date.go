@@ -12,30 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package json
+package export
 
 import (
-	"bytes"
 	"time"
 )
 
-type RubyDate time.Time
+type Iso8601Date time.Time
 
-func (t *RubyDate) String() string {
-	return time.Time(*t).Format(time.RubyDate)
-}
-
-func (t *RubyDate) Equal(u RubyDate) bool {
-	return time.Time(*t).Equal(time.Time(u))
-}
-
-func (t *RubyDate) UnmarshalJSON(buf []byte) error {
-	s := bytes.Trim(buf, `"`)
-	parsed, err := time.ParseInLocation(time.RubyDate, string(s), time.UTC)
-	if err != nil {
-		return err
-	}
-
-	*t = RubyDate(parsed)
-	return nil
+func (t *Iso8601Date) String() string {
+	return time.Time(*t).Format("2006-01-02T15:04:05-07:00")
 }

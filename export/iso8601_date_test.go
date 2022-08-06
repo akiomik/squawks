@@ -12,30 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package json
+//go:build small
+// +build small
+
+package export
 
 import (
-	"bytes"
+	"testing"
 	"time"
 )
 
-type RubyDate time.Time
-
-func (t *RubyDate) String() string {
-	return time.Time(*t).Format(time.RubyDate)
-}
-
-func (t *RubyDate) Equal(u RubyDate) bool {
-	return time.Time(*t).Equal(time.Time(u))
-}
-
-func (t *RubyDate) UnmarshalJSON(buf []byte) error {
-	s := bytes.Trim(buf, `"`)
-	parsed, err := time.ParseInLocation(time.RubyDate, string(s), time.UTC)
-	if err != nil {
-		return err
+func TestString(t *testing.T) {
+	d := Iso8601Date(time.Date(2013, 8, 19, 2, 4, 28, 0, time.UTC))
+	expected := "2013-08-19T02:04:28+00:00"
+	actual := d.String()
+	if actual != expected {
+		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
+		return
 	}
-
-	*t = RubyDate(parsed)
-	return nil
 }
