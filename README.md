@@ -3,7 +3,7 @@ get-old-tweets
 
 [![Go](https://github.com/akiomik/get-old-tweets/actions/workflows/go.yml/badge.svg)](https://github.com/akiomik/get-old-tweets/actions/workflows/go.yml)
 
-A cli tool to download old tweets on twitter.
+A cli tool to get old tweets on twitter (inspired by [Jefferson-Henrique/GetOldTweets-python](https://github.com/Jefferson-Henrique/GetOldTweets-python)).
 
 ## Usage
 
@@ -22,6 +22,41 @@ Flags:
       --user-agent string   set custom user-agent
   -v, --version             version for get-old-tweets
 ```
+
+## Example
+
+Get tweets by username:
+
+```sh
+get-old-tweets --from 'barackobama' -o out.csv
+```
+
+Get tweets by query search:
+
+```sh
+get-old-tweets -q 'europe refugees' -o out.csv
+```
+
+Get tweets by username and bound dates:
+
+```sh
+get-old-tweets --from 'barackobama' --since 2015-09-10 --until 2015-09-12 -o out.csv
+```
+
+## Output CSV schema
+
+- `id` (int)
+- `username` (str)
+- `created_at` (datetime)
+- `full_text` (str)
+- `retweet_count` (int)
+- `favorite_count` (int)
+- `reply_count` (int)
+- `quote_count` (int)
+- `geo` (str)
+- `coordinates` (str)
+- `lang` (str)
+- `source` (str)
 
 ## Build
 
