@@ -36,7 +36,7 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "get-old-tweets",
+	Use:     "get-old-tweets --out FILENAME",
 	Short:   "get-old-tweets v" + config.Version,
 	Version: config.Version,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -83,13 +83,13 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.Flags().StringVarP(&out, "out", "o", "", "output csv filename")
-	rootCmd.Flags().StringVarP(&text, "query", "q", "", "query text to be matched")
-	rootCmd.Flags().StringVarP(&since, "since", "", "", "lower bound date to restrict search")
-	rootCmd.Flags().StringVarP(&until, "until", "", "", "upper bound date to restrict search")
-	rootCmd.Flags().StringVarP(&from, "from", "", "", "username from a twitter account")
-	rootCmd.Flags().StringVarP(&to, "to", "", "", "username to a twitter account")
-	rootCmd.Flags().StringVarP(&userAgent, "user-agent", "", "", "user-agent for request")
+	rootCmd.Flags().StringVarP(&from, "from", "", "", "find tweets sent from a certain user")
+	rootCmd.Flags().StringVarP(&out, "out", "o", "", "output csv filename (required)")
+	rootCmd.Flags().StringVarP(&text, "query", "q", "", "query text to search")
+	rootCmd.Flags().StringVarP(&since, "since", "", "", "find tweets since a certain day (e.g. 2014-07-21)")
+	rootCmd.Flags().StringVarP(&to, "to", "", "", "find tweets sent in reply to a certain user")
+	rootCmd.Flags().StringVarP(&until, "until", "", "", "find tweets until a certain day (e.g. 2020-09-06)")
+	rootCmd.Flags().StringVarP(&userAgent, "user-agent", "", "", "set custom user-agent")
 	rootCmd.MarkFlagRequired("out")
 }
 
