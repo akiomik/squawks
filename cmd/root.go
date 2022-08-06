@@ -32,6 +32,7 @@ var (
 	until     string
 	from      string
 	to        string
+	lang      string
 	userAgent string
 )
 
@@ -46,6 +47,7 @@ var rootCmd = &cobra.Command{
 			Until: until,
 			From:  from,
 			To:    to,
+			Lang:  lang,
 		}
 		if q.IsEmpty() {
 			fmt.Fprintln(os.Stderr, "Error: One or more queries are required")
@@ -84,6 +86,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.Flags().StringVarP(&from, "from", "", "", "find tweets sent from a certain user")
+	rootCmd.Flags().StringVarP(&lang, "lang", "", "", "find tweets by a certain language (e.g. en, es, fr)")
 	rootCmd.Flags().StringVarP(&out, "out", "o", "", "output csv filename (required)")
 	rootCmd.Flags().StringVarP(&text, "query", "q", "", "query text to search")
 	rootCmd.Flags().StringVarP(&since, "since", "", "", "find tweets since a certain day (e.g. 2014-07-21)")

@@ -28,6 +28,7 @@ func TestEncode(t *testing.T) {
 		until    string
 		from     string
 		to       string
+		lang     string
 		expected string
 	}{
 		"none": {
@@ -36,6 +37,7 @@ func TestEncode(t *testing.T) {
 			until:    "",
 			from:     "",
 			to:       "",
+			lang:     "",
 			expected: "",
 		},
 		"all": {
@@ -44,7 +46,8 @@ func TestEncode(t *testing.T) {
 			until:    "2020-09-07",
 			from:     "foo",
 			to:       "bar",
-			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar",
+			lang:     "ja",
+			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja",
 		},
 	}
 
@@ -56,6 +59,7 @@ func TestEncode(t *testing.T) {
 				Until: e.until,
 				From:  e.from,
 				To:    e.to,
+				Lang:  e.lang,
 			}
 
 			actual := q.Encode()
@@ -75,6 +79,7 @@ func TestIsEmpty(t *testing.T) {
 		until    string
 		from     string
 		to       string
+		lang     string
 		expected bool
 	}{
 		"none": {
@@ -83,6 +88,7 @@ func TestIsEmpty(t *testing.T) {
 			until:    "",
 			from:     "",
 			to:       "",
+			lang:     "",
 			expected: true,
 		},
 		"all": {
@@ -91,6 +97,7 @@ func TestIsEmpty(t *testing.T) {
 			until:    "2020-09-07",
 			from:     "foo",
 			to:       "bar",
+			lang:     "ja",
 			expected: false,
 		},
 	}
@@ -101,12 +108,15 @@ func TestIsEmpty(t *testing.T) {
 				Text:  e.text,
 				Since: e.since,
 				Until: e.until,
+				From:  e.from,
+				To:    e.to,
+				Lang:  e.lang,
 			}
 
 			actual := q.IsEmpty()
 
 			if actual != e.expected {
-				t.Errorf("Expect Query#IsEmpty() = %v, but got %v", e.expected, actual)
+				t.Errorf("Expect %v, got %v", e.expected, actual)
 				return
 			}
 		})

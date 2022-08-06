@@ -24,6 +24,7 @@ type Query struct {
 	Until string
 	From  string
 	To    string
+	Lang  string
 }
 
 func (q *Query) Encode() string {
@@ -47,6 +48,10 @@ func (q *Query) Encode() string {
 
 	if len(q.To) != 0 {
 		ss = append(ss, "to:"+q.To)
+	}
+
+	if len(q.Lang) != 0 {
+		ss = append(ss, "lang:"+q.Lang)
 	}
 
 	return strings.Join(ss[:], " ")
