@@ -71,9 +71,15 @@ func (c *Client) GetGuestToken() (string, error) {
 	return res.Result().(*json.Activate).GuestToken, nil
 }
 
-func (c *Client) Search(q Query, guestToken string, cursor string) (*json.Adaptive, error) {
+type SearchOptions struct {
+	GuestToken string
+	Cursor     string
+	Query      Query
+}
+
+func (c *Client) Search(opts *SearchOptions) (*json.Adaptive, error) {
 	params := map[string]string{
-		"q":                   q.Encode(),
+		"q":                   opts.Query.Encode(),
 		"include_quote_count": "true",
 		"include_reply_count": "1",
 		"tweet_mode":          "extended",
@@ -82,14 +88,14 @@ func (c *Client) Search(q Query, guestToken string, cursor string) (*json.Adapti
 		"tweet_search_mode":   "live",
 	}
 
-	if len(cursor) != 0 {
-		params["cursor"] = cursor
+	if len(opts.Cursor) != 0 {
+		params["cursor"] = opts.Cursor
 	}
 
 	res, err := c.Request().
 		SetResult(json.Adaptive{}).
 		SetError(json.ErrorResponse{}).
-		SetHeader("x-guest-token", guestToken).
+		SetHeader("x-guest-token", opts.GuestToken).
 		SetQueryParams(params).
 		Get("https://twitter.com/i/api/2/search/adaptive.json")
 
@@ -109,14 +115,14 @@ type SearchResult struct {
 	Error    error
 }
 
-func (c *Client) SearchAll(q Query) <-chan *SearchResult {
+func (c *Client) SearchAll(opts *SearchOptions) <-chan *SearchResult {
 	ch := make(chan *SearchResult)
 
 	go func() {
 		defer close(ch)
 
-		cursor := ""
-		guestToken := ""
+		cursor := opts.Cursor
+		guestToken := opts.GuestToken
 		attempts := uint(0)
 
 		for {
@@ -130,7 +136,8 @@ func (c *Client) SearchAll(q Query) <-chan *SearchResult {
 				guestToken = newGuestToken
 			}
 
-			res, err := c.Search(q, guestToken, cursor)
+			newOpts := &SearchOptions{Query: opts.Query, Cursor: cursor, GuestToken: guestToken}
+			res, err := c.Search(newOpts)
 
 			if err != nil {
 				// TODO: check error code

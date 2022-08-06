@@ -71,7 +71,8 @@ var rootCmd = &cobra.Command{
 		go func() {
 			defer close(ch)
 
-			for res := range client.SearchAll(q) {
+			opts := &twitter.SearchOptions{Query: q}
+			for res := range client.SearchAll(opts) {
 				if res.Error != nil {
 					fmt.Fprintln(os.Stderr, "Error: %w", res.Error)
 					os.Exit(1)

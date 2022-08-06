@@ -130,7 +130,8 @@ func TestSearchWhenWithoutCursor(t *testing.T) {
 	})
 
 	q := Query{Text: "foo"}
-	actual, err := c.Search(q, "", "")
+	opts := &SearchOptions{Query: q, GuestToken: "", Cursor: ""}
+	actual, err := c.Search(opts)
 	if err != nil {
 		t.Errorf("Expect nil, got %v", err)
 		return
@@ -166,7 +167,8 @@ func TestSearchWhenWithCursor(t *testing.T) {
 	})
 
 	q := Query{Text: "foo"}
-	actual, err := c.Search(q, "", "scroll:deadbeef")
+	opts := &SearchOptions{Query: q, GuestToken: "", Cursor: "scroll:deadbeef"}
+	actual, err := c.Search(opts)
 	if err != nil {
 		t.Errorf("Expect nil, got %v", err)
 		return
@@ -202,7 +204,8 @@ func TestSearchWhenError(t *testing.T) {
 	})
 
 	q := Query{Text: "foo"}
-	actualAdaptive, err := c.Search(q, "", "")
+	opts := &SearchOptions{Query: q, GuestToken: "", Cursor: ""}
+	actualAdaptive, err := c.Search(opts)
 
 	expectedError := json.ErrorResponse{Errors: []json.Error{json.Error{Code: 200, Message: "forbidden"}}}
 	actualError, ok := err.(*json.ErrorResponse)
@@ -246,7 +249,8 @@ func TestSearchAllWhenRestTweetDoNotExist(t *testing.T) {
 	})
 
 	q := Query{Text: "foo"}
-	ch := c.SearchAll(q)
+	opts := &SearchOptions{Query: q}
+	ch := c.SearchAll(opts)
 
 	actual1 := <-ch
 	if actual1.Error != nil {
@@ -333,7 +337,8 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 	})
 
 	q := Query{Text: "foo"}
-	ch := c.SearchAll(q)
+	opts := &SearchOptions{Query: q}
+	ch := c.SearchAll(opts)
 
 	actual1 := <-ch
 	if actual1.Error != nil {

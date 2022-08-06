@@ -64,55 +64,55 @@ func TestExportCsvNonEmpty(t *testing.T) {
 		defer close(ch)
 
 		ch <- []Record{
-      Record{
-        Id:            1000,
-        Username:      "watson1",
-        CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
-        FullText:      "To Sherlock Holmes she is always the woman.",
-        RetweetCount:  3000,
-        FavoriteCount: 4000,
-        ReplyCount:    5000,
-        QuoteCount:    6000,
-        Lang:          "en",
-      },
-      Record{
-        Id:            100,
-        Username:      "watson2",
-        CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
-        FullText:      "To Sherlock Holmes she is always the woman.",
-        RetweetCount:  300,
-        FavoriteCount: 400,
-        ReplyCount:    500,
-        QuoteCount:    600,
-        Lang:          "en",
-      },
-    }
+			Record{
+				Id:            1000,
+				Username:      "watson1",
+				CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+				FullText:      "To Sherlock Holmes she is always the woman.",
+				RetweetCount:  3000,
+				FavoriteCount: 4000,
+				ReplyCount:    5000,
+				QuoteCount:    6000,
+				Lang:          "en",
+			},
+			Record{
+				Id:            100,
+				Username:      "watson2",
+				CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+				FullText:      "To Sherlock Holmes she is always the woman.",
+				RetweetCount:  300,
+				FavoriteCount: 400,
+				ReplyCount:    500,
+				QuoteCount:    600,
+				Lang:          "en",
+			},
+		}
 
-    ch <- []Record{
-      Record{
-        Id:            10,
-        Username:      "watson3",
-        CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
-        FullText:      "To Sherlock Holmes she is always the woman.",
-        RetweetCount:  30,
-        FavoriteCount: 40,
-        ReplyCount:    50,
-        QuoteCount:    60,
-        Lang:          "en",
-      },
-      Record{
-        Id:            1,
-        Username:      "watson4",
-        CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
-        FullText:      "To Sherlock Holmes she is always the woman.",
-        RetweetCount:  3,
-        FavoriteCount: 4,
-        ReplyCount:    5,
-        QuoteCount:    6,
-        Lang:          "en",
-      },
-    }
-  }()
+		ch <- []Record{
+			Record{
+				Id:            10,
+				Username:      "watson3",
+				CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+				FullText:      "To Sherlock Holmes she is always the woman.",
+				RetweetCount:  30,
+				FavoriteCount: 40,
+				ReplyCount:    50,
+				QuoteCount:    60,
+				Lang:          "en",
+			},
+			Record{
+				Id:            1,
+				Username:      "watson4",
+				CreatedAt:     json.RubyDate(time.Date(2020, 9, 6, 0, 1, 2, 0, time.UTC)),
+				FullText:      "To Sherlock Holmes she is always the woman.",
+				RetweetCount:  3,
+				FavoriteCount: 4,
+				ReplyCount:    5,
+				QuoteCount:    6,
+				Lang:          "en",
+			},
+		}
+	}()
 
 	done := ExportCsv(f, ch)
 	<-done

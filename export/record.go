@@ -36,26 +36,26 @@ type Record struct {
 }
 
 func NewRecordsFromAdaptive(j *json.Adaptive) []Record {
-  l := make([]Record, len(j.GlobalObjects.Tweets))
+	l := make([]Record, len(j.GlobalObjects.Tweets))
 
-  for i, k := range ReversedKeysOf(j.GlobalObjects.Tweets) {
-    t := j.GlobalObjects.Tweets[k]
-    u := j.GlobalObjects.Users[strconv.FormatUint(t.UserId, 10)]
-    l[i] = Record{
-      Id: t.Id,
-      Username: u.ScreenName,
-      CreatedAt: t.CreatedAt,
-      FullText: t.FullText,
-      RetweetCount: t.RetweetCount,
-      FavoriteCount: t.FavoriteCount,
-      ReplyCount: t.ReplyCount,
-      QuoteCount: t.QuoteCount,
-      Geo: t.Geo,
-      Coodinates: t.Coodinates,
-      Lang: t.Lang,
-      Source: t.Source,
-    }
-  }
+	for i, k := range ReversedKeysOf(j.GlobalObjects.Tweets) {
+		t := j.GlobalObjects.Tweets[k]
+		u := j.GlobalObjects.Users[strconv.FormatUint(t.UserId, 10)]
+		l[i] = Record{
+			Id:            t.Id,
+			Username:      u.ScreenName,
+			CreatedAt:     t.CreatedAt,
+			FullText:      t.FullText,
+			RetweetCount:  t.RetweetCount,
+			FavoriteCount: t.FavoriteCount,
+			ReplyCount:    t.ReplyCount,
+			QuoteCount:    t.QuoteCount,
+			Geo:           t.Geo,
+			Coodinates:    t.Coodinates,
+			Lang:          t.Lang,
+			Source:        t.Source,
+		}
+	}
 
-  return l
+	return l
 }
