@@ -231,9 +231,19 @@ func TestSearchAllWhenRestTweetDoNotExist(t *testing.T) {
 	httpmock.ActivateNonDefault(c.Client.GetClient())
 	defer httpmock.DeactivateAndReset()
 
-	url := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
-	res := `{}`
-	httpmock.RegisterResponder("GET", url, httpmock.NewStringResponder(200, res))
+	url1 := "https://api.twitter.com/1.1/guest/activate.json"
+	httpmock.RegisterResponder("POST", url1, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(200, `{ "guest_token": "1234" }`)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
+
+	url2 := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
+	httpmock.RegisterResponder("GET", url2, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(200, `{}`)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
 
 	q := Query{Text: "foo"}
 	ch := c.SearchAll(q)
@@ -259,8 +269,13 @@ func TestSearchAllWhenRestTweetDoNotExist(t *testing.T) {
 	httpmock.GetTotalCallCount()
 	info := httpmock.GetCallCountInfo()
 
-	if info["GET "+url] != 1 {
-		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url, info["GET "+url])
+	if info["POST "+url1] != 1 {
+		t.Errorf("The request POST %s was expected to execute once, but it executed %d time(s)", url1, info["POST "+url1])
+		return
+	}
+
+	if info["GET "+url2] != 1 {
+		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url2, info["GET "+url2])
 		return
 	}
 }
@@ -271,8 +286,15 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 	httpmock.ActivateNonDefault(c.Client.GetClient())
 	defer httpmock.DeactivateAndReset()
 
-	url1 := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
-	res1 := `{
+	url1 := "https://api.twitter.com/1.1/guest/activate.json"
+	httpmock.RegisterResponder("POST", url1, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(200, `{ "guest_token": "1234" }`)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
+
+	url2 := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
+	res2 := `{
     "globalObjects": {
       "tweets": {
         "1": {
@@ -297,16 +319,15 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
       }]
     }
   }`
-	httpmock.RegisterResponder("GET", url1, func(req *http.Request) (*http.Response, error) {
-		res := httpmock.NewStringResponse(200, res1)
+	httpmock.RegisterResponder("GET", url2, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(200, res2)
 		res.Header.Add("Content-Type", "application/json")
 		return res, nil
 	})
 
-	url2 := "https://twitter.com/i/api/2/search/adaptive.json?count=40&cursor=scroll%3Adeadbeef&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
-	res2 := `{}`
-	httpmock.RegisterResponder("GET", url2, func(req *http.Request) (*http.Response, error) {
-		res := httpmock.NewStringResponse(200, res2)
+	url3 := "https://twitter.com/i/api/2/search/adaptive.json?count=40&cursor=scroll%3Adeadbeef&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
+	httpmock.RegisterResponder("GET", url3, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(200, `{}`)
 		res.Header.Add("Content-Type", "application/json")
 		return res, nil
 	})
@@ -375,13 +396,18 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 	httpmock.GetTotalCallCount()
 	info := httpmock.GetCallCountInfo()
 
-	if info["GET "+url1] != 1 {
-		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url1, info["GET "+url1])
+	if info["POST "+url1] != 1 {
+		t.Errorf("The request POST %s was expected to execute once, but it executed %d time(s)", url1, info["POST "+url1])
 		return
 	}
 
 	if info["GET "+url2] != 1 {
 		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url2, info["GET "+url2])
+		return
+	}
+
+	if info["GET "+url3] != 1 {
+		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url3, info["GET "+url3])
 		return
 	}
 }

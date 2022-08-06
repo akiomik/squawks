@@ -24,9 +24,10 @@ import (
 )
 
 type Client struct {
-	Client    *resty.Client
-	UserAgent string
-	AuthToken string
+	Client           *resty.Client
+	UserAgent        string
+	AuthToken        string
+	MaxRetryAttempts uint
 }
 
 func NewClient() *Client {
@@ -34,6 +35,7 @@ func NewClient() *Client {
 	client.Client = resty.New()
 	client.UserAgent = "get-old-tweets/" + config.Version
 	client.AuthToken = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
+	client.MaxRetryAttempts = 3
 
 	return &client
 }
@@ -115,11 +117,37 @@ func (c *Client) SearchAll(q Query) <-chan *SearchResult {
 
 		cursor := ""
 		guestToken := ""
+		attempts := uint(0)
+
 		for {
+			if guestToken == "" {
+				newGuestToken, err := c.GetGuestToken()
+				if err != nil {
+					ch <- &SearchResult{nil, fmt.Errorf("Failed to get guest token: %w", err)}
+					break
+				}
+
+				guestToken = newGuestToken
+			}
+
 			res, err := c.Search(q, guestToken, cursor)
+
 			if err != nil {
-				ch <- &SearchResult{nil, fmt.Errorf("Failed to search: %w", err)}
-				break
+				// TODO: check error code
+				_, ok := err.(*json.ErrorResponse)
+				if ok && c.MaxRetryAttempts != 0 {
+					if attempts >= c.MaxRetryAttempts {
+						ch <- &SearchResult{nil, fmt.Errorf("Retry limit exceeded: %w", err)}
+						break
+					}
+
+					guestToken = ""
+					attempts++
+					continue
+				} else {
+					ch <- &SearchResult{nil, fmt.Errorf("Failed to search: %w", err)}
+					break
+				}
 			}
 
 			ch <- &SearchResult{res, nil}
