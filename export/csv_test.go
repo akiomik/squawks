@@ -46,7 +46,7 @@ func TestExportCsvEmpty(t *testing.T) {
 	reader := csv.NewReader(f)
 	_, err = reader.Read()
 	if err != io.EOF {
-		t.Errorf("Expect ExportCsv() to create an empty csv file, but not empty: %v", err)
+		t.Errorf("Expect to create an empty csv file, got %v", err)
 		return
 	}
 }
@@ -159,7 +159,7 @@ func TestExportCsvNonEmpty(t *testing.T) {
 
 	expectedHeader := []string{"id", "username", "created_at", "full_text", "retweet_count", "favorite_count", "reply_count", "quote_count", "geo", "coordinates", "lang", "source"}
 	if !reflect.DeepEqual(actualHeader, expectedHeader) {
-		t.Errorf("Expect ExportCsv() to write %v as a header, but got %v", expectedHeader, expectedHeader)
+		t.Errorf("Expect to write %v as a header, got %v", expectedHeader, expectedHeader)
 		return
 	}
 
@@ -178,14 +178,14 @@ func TestExportCsvNonEmpty(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(actualRecord, expectedRecord) {
-			t.Errorf("Expect ExportCsv() to write %v as a record #%d, but got %v", expectedRecord, i, actualRecord)
+			t.Errorf("Expect to write %v as a record #%d, got %v", expectedRecord, i, actualRecord)
 			return
 		}
 	}
 
 	_, err = reader.Read()
 	if err != io.EOF {
-		t.Errorf("Expect ExportCsv() to reach EOF, but not EOF: %v", err)
+		t.Errorf("Expect to reach EOF, got not EOF %v", err)
 		return
 	}
 }

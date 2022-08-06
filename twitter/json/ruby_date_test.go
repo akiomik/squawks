@@ -32,7 +32,7 @@ func TestString(t *testing.T) {
 	expected := "Mon Aug 19 02:04:28 +0000 2013"
 	actual := d.String()
 	if actual != expected {
-		t.Errorf("Expect RubyDate#String() = \"%s\", but got \"%s\"", expected, actual)
+		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
 		return
 	}
 }
@@ -42,7 +42,7 @@ func TestIso8601(t *testing.T) {
 	expected := "2013-08-19T02:04:28+00:00"
 	actual := d.Iso8601()
 	if actual != expected {
-		t.Errorf("Expect RubyDate#Iso8601() = \"%s\", but got \"%s\"", expected, actual)
+		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
 		return
 	}
 }
@@ -69,7 +69,7 @@ func TestEqual(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			actual := e.this.Equal(e.that)
 			if actual != e.expected {
-				t.Errorf("Expect RubyDate#Equal() = %v, but got %v", e.expected, actual)
+				t.Errorf("Expect %v, got %v", e.expected, actual)
 				return
 			}
 		})
@@ -84,14 +84,14 @@ func TestUnmarshallWhenSucceeded(t *testing.T) {
 	schema := new(TestSchema)
 	err := json.Unmarshal([]byte(jsonString), &schema)
 	if err != nil {
-		t.Errorf("Expect Query#Encode() not to return error object, but got \"%v\"", err)
+		t.Errorf("Expect nil, got %v", err)
 		return
 	}
 
 	expected := RubyDate(time.Date(2013, 8, 19, 2, 4, 28, 0, time.UTC))
 	actual := schema.CreatedAt
 	if !actual.Equal(expected) {
-		t.Errorf("Expect RubyDate#Unmarshal() = \"%v\", but got \"%v\"", expected, actual)
+		t.Errorf("Expect %v, got %v", expected, actual)
 		return
 	}
 }
@@ -104,7 +104,7 @@ func TestUnmarshallWhenFailed(t *testing.T) {
 	schema := new(TestSchema)
 	err := json.Unmarshal([]byte(jsonString), &schema)
 	if err == nil {
-		t.Errorf("Expect Query#Encode() to return error object, but got nil")
+		t.Errorf("Expect error object, got nil")
 		return
 	}
 }

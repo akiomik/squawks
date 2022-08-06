@@ -53,7 +53,7 @@ func TestContains(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			actual := Contains(ss, e.value)
 			if actual != e.expected {
-				t.Errorf("Expect Contains(%v, %s) = %v, but got %v", ss, e.value, e.expected, actual)
+				t.Errorf("Expect %v, got %v", e.expected, actual)
 				return
 			}
 		})
@@ -73,13 +73,13 @@ func TestKeysOf(t *testing.T) {
 	ks := KeysOf(m)
 
 	if len(ks) != len(m) {
-		t.Errorf("Expect len(KeysOf()) to be %d, but got %d", len(m), len(ks))
+		t.Errorf("Expect %d, got %d", len(m), len(ks))
 		return
 	}
 
 	for k, _ := range m {
 		if !Contains(ks, k) {
-			t.Errorf("Expect KeysOf() to include \"%s\", but none", k)
+			t.Errorf(`Expect to include "%s", but none`, k)
 			return
 		}
 	}
@@ -106,7 +106,7 @@ func TestReversedKeysOf(t *testing.T) {
 	actual := ReversedKeysOf(m)
 
 	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("Expect ReversedKeysOf() = %v, but got %v", expected, actual)
+		t.Errorf("Expect %v, got %v", expected, actual)
 		return
 	}
 }

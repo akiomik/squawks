@@ -62,7 +62,7 @@ func TestFindCursorWhenReplaceEntryExists(t *testing.T) {
 	expected := "scroll:foobar"
 	actual, err := j.FindCursor()
 	if err != nil {
-		t.Errorf(`Expect not error object, got "%v"`, err)
+		t.Errorf("Expect nil, got %v", err)
 		return
 	}
 
@@ -109,7 +109,7 @@ func TestFindCursorWhenAddEntriesExist(t *testing.T) {
 	expected := "scroll:foobar"
 	actual, err := j.FindCursor()
 	if err != nil {
-		t.Errorf(`Expect not error object, got "%v"`, err)
+		t.Errorf("Expect nil, got %v", err)
 		return
 	}
 

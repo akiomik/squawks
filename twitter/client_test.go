@@ -38,7 +38,7 @@ func TestNewClient(t *testing.T) {
 	}
 
 	if len(c.AuthToken) == 0 {
-		t.Errorf(`Expect not "", got "%s"`, c.AuthToken)
+		t.Errorf(`Expect not "", got ""`)
 		return
 	}
 }
@@ -54,11 +54,11 @@ func TestRequest(t *testing.T) {
 	client := c.Request()
 
 	if client.Header.Get("User-Agent") != expectedUserAgent {
-		t.Errorf(`Expect "%v", got "%v"`, expectedUserAgent, client.Header.Get("User-Agent"))
+		t.Errorf("Expect %v, got %v", expectedUserAgent, client.Header.Get("User-Agent"))
 	}
 
 	if client.Token != expectedAuthToken {
-		t.Errorf(`Expect "%v", got "%v"`, expectedAuthToken, client.Token)
+		t.Errorf("Expect %v, got %v", expectedAuthToken, client.Token)
 	}
 }
 
@@ -78,7 +78,7 @@ func TestGetGuestTokenSuccess(t *testing.T) {
 
 	actual, err := c.GetGuestToken()
 	if err != nil {
-		t.Errorf("Expect not error objects, got %v", err)
+		t.Errorf("Expect nil, got %v", err)
 		return
 	}
 
@@ -132,7 +132,7 @@ func TestSearchWhenWithoutCursor(t *testing.T) {
 	q := Query{Text: "foo"}
 	actual, err := c.Search(q, "", "")
 	if err != nil {
-		t.Errorf("Expect not error objects, got %v", err)
+		t.Errorf("Expect nil, got %v", err)
 		return
 	}
 
@@ -168,7 +168,7 @@ func TestSearchWhenWithCursor(t *testing.T) {
 	q := Query{Text: "foo"}
 	actual, err := c.Search(q, "", "scroll:deadbeef")
 	if err != nil {
-		t.Errorf("Expect not error objects, got %v", err)
+		t.Errorf("Expect nil, got %v", err)
 		return
 	}
 

@@ -26,6 +26,6 @@ func TestVersion(t *testing.T) {
 	// from https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
 	r := regexp.MustCompile(`^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`)
 	if !r.MatchString(Version) {
-		t.Errorf("Expect Version to match semver, but it does not")
+		t.Errorf("Expect to match semver, but it does not")
 	}
 }
