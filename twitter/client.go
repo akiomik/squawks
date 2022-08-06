@@ -123,7 +123,7 @@ func (c *Client) SearchAll(q Query) <-chan *SearchResult {
 			if guestToken == "" {
 				newGuestToken, err := c.GetGuestToken()
 				if err != nil {
-					ch <- &SearchResult{nil, fmt.Errorf("Failed to get guest token: %w", err)}
+					ch <- &SearchResult{nil, fmt.Errorf("failed to get guest token: %w", err)}
 					break
 				}
 
@@ -137,7 +137,7 @@ func (c *Client) SearchAll(q Query) <-chan *SearchResult {
 				_, ok := err.(*json.ErrorResponse)
 				if ok && c.MaxRetryAttempts != 0 {
 					if attempts >= c.MaxRetryAttempts {
-						ch <- &SearchResult{nil, fmt.Errorf("Retry limit exceeded: %w", err)}
+						ch <- &SearchResult{nil, fmt.Errorf("retry limit exceeded: %w", err)}
 						break
 					}
 
@@ -145,7 +145,7 @@ func (c *Client) SearchAll(q Query) <-chan *SearchResult {
 					attempts++
 					continue
 				} else {
-					ch <- &SearchResult{nil, fmt.Errorf("Failed to search: %w", err)}
+					ch <- &SearchResult{nil, fmt.Errorf("failed to search: %w", err)}
 					break
 				}
 			}
@@ -157,7 +157,7 @@ func (c *Client) SearchAll(q Query) <-chan *SearchResult {
 
 			cursor, err = res.FindCursor()
 			if err != nil {
-				ch <- &SearchResult{nil, fmt.Errorf("Failed to find cursor: %w", err)}
+				ch <- &SearchResult{nil, fmt.Errorf("failed to find cursor: %w", err)}
 				break
 			}
 		}
