@@ -53,6 +53,23 @@ func (c *Client) Request() *resty.Request {
 	return client
 }
 
+func (c *Client) GetGuestToken() (string, error) {
+	res, err := c.Request().
+		SetResult(json.Activate{}).
+		SetError(json.ErrorResponse{}).
+		Post("https://api.twitter.com/1.1/guest/activate.json")
+
+	if err != nil {
+		return "", err
+	}
+
+	if res.IsError() {
+		return "", res.Error().(*json.ErrorResponse)
+	}
+
+	return res.Result().(*json.Activate).GuestToken, nil
+}
+
 func (c *Client) Search(q Query, guestToken string, cursor string) (*json.Adaptive, error) {
 	params := map[string]string{
 		"q":                   q.Encode(),

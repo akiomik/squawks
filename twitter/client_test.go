@@ -62,6 +62,59 @@ func TestRequest(t *testing.T) {
 	}
 }
 
+func TestGetGuestTokenSuccess(t *testing.T) {
+	c := NewClient()
+
+	httpmock.ActivateNonDefault(c.Client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	url := "https://api.twitter.com/1.1/guest/activate.json"
+	res := `{ "guest_token": "deadbeef" }`
+	httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(200, res)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
+
+	actual, err := c.GetGuestToken()
+	if err != nil {
+		t.Errorf("Expect not error objects, got %v", err)
+		return
+	}
+
+	expected := "deadbeef"
+	if actual != expected {
+		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
+		return
+	}
+}
+
+func TestGetGuestTokenFailure(t *testing.T) {
+	c := NewClient()
+
+	httpmock.ActivateNonDefault(c.Client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	url := "https://api.twitter.com/1.1/guest/activate.json"
+	res := `{ "errors": [{ "code": 200, "message": "forbidden" }] }`
+	httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(403, res)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
+
+	actual, err := c.GetGuestToken()
+	if err == nil {
+		t.Errorf("Expect error objects, got nil")
+		return
+	}
+
+	if actual != "" {
+		t.Errorf(`Expect "", got "%s"`, actual)
+		return
+	}
+}
+
 func TestSearchWhenWithoutCursor(t *testing.T) {
 	c := NewClient()
 
@@ -79,7 +132,7 @@ func TestSearchWhenWithoutCursor(t *testing.T) {
 	q := Query{Text: "foo"}
 	actual, err := c.Search(q, "", "")
 	if err != nil {
-		t.Errorf("Expect Client#Search not to return error objects, but got %v", err)
+		t.Errorf("Expect not error objects, got %v", err)
 		return
 	}
 
