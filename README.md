@@ -12,6 +12,7 @@ Usage:
   get-old-tweets --out FILENAME [flags]
 
 Flags:
+      --filter string       find tweets by type of account (e.g. verified)
       --from string         find tweets sent from a certain user
       --lang string         find tweets by a certain language (e.g. en, es, fr)
   -h, --help                help for get-old-tweets

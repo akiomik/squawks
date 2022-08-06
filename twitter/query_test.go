@@ -29,6 +29,7 @@ func TestEncode(t *testing.T) {
 		from     string
 		to       string
 		lang     string
+		filter   string
 		expected string
 	}{
 		"none": {
@@ -38,6 +39,7 @@ func TestEncode(t *testing.T) {
 			from:     "",
 			to:       "",
 			lang:     "",
+			filter:   "",
 			expected: "",
 		},
 		"all": {
@@ -47,19 +49,21 @@ func TestEncode(t *testing.T) {
 			from:     "foo",
 			to:       "bar",
 			lang:     "ja",
-			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja",
+			filter:   "verified",
+			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja filter:verified",
 		},
 	}
 
 	for name, e := range examples {
 		t.Run(name, func(t *testing.T) {
 			q := Query{
-				Text:  e.text,
-				Since: e.since,
-				Until: e.until,
-				From:  e.from,
-				To:    e.to,
-				Lang:  e.lang,
+				Text:   e.text,
+				Since:  e.since,
+				Until:  e.until,
+				From:   e.from,
+				To:     e.to,
+				Lang:   e.lang,
+				Filter: e.filter,
 			}
 
 			actual := q.Encode()
@@ -80,6 +84,7 @@ func TestIsEmpty(t *testing.T) {
 		from     string
 		to       string
 		lang     string
+		filter   string
 		expected bool
 	}{
 		"none": {
@@ -89,6 +94,7 @@ func TestIsEmpty(t *testing.T) {
 			from:     "",
 			to:       "",
 			lang:     "",
+			filter:   "",
 			expected: true,
 		},
 		"all": {
@@ -98,6 +104,7 @@ func TestIsEmpty(t *testing.T) {
 			from:     "foo",
 			to:       "bar",
 			lang:     "ja",
+			filter:   "verified",
 			expected: false,
 		},
 	}
@@ -105,12 +112,13 @@ func TestIsEmpty(t *testing.T) {
 	for name, e := range examples {
 		t.Run(name, func(t *testing.T) {
 			q := Query{
-				Text:  e.text,
-				Since: e.since,
-				Until: e.until,
-				From:  e.from,
-				To:    e.to,
-				Lang:  e.lang,
+				Text:   e.text,
+				Since:  e.since,
+				Until:  e.until,
+				From:   e.from,
+				To:     e.to,
+				Lang:   e.lang,
+				Filter: e.filter,
 			}
 
 			actual := q.IsEmpty()
