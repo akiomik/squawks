@@ -21,6 +21,30 @@ import (
 	"testing"
 )
 
+var (
+	sqCursorTopEntry = Entry{
+		EntryId: "sq-cursor-top",
+		Content: Content{
+			Operation: Operation{
+				Cursor: Cursor{
+					Value: "refresh:foobar",
+				},
+			},
+		},
+	}
+
+	sqCursorBottomEntry = Entry{
+		EntryId: "sq-cursor-bottom",
+		Content: Content{
+			Operation: Operation{
+				Cursor: Cursor{
+					Value: "scroll:foobar",
+				},
+			},
+		},
+	}
+)
+
 func TestFindCursorWhenReplaceEntryExists(t *testing.T) {
 	j := Adaptive{
 		Timeline: Timeline{
@@ -28,31 +52,13 @@ func TestFindCursorWhenReplaceEntryExists(t *testing.T) {
 				Instruction{
 					ReplaceEntry: ReplaceEntry{
 						EntryIdToReplace: "sq-cursor-top",
-						Entry: Entry{
-							EntryId: "sq-cursor-top",
-							Content: Content{
-								Operation: Operation{
-									Cursor: Cursor{
-										Value: "refresh:foobar",
-									},
-								},
-							},
-						},
+						Entry:            sqCursorTopEntry,
 					},
 				},
 				Instruction{
 					ReplaceEntry: ReplaceEntry{
 						EntryIdToReplace: "sq-cursor-bottom",
-						Entry: Entry{
-							EntryId: "sq-cursor-bottom",
-							Content: Content{
-								Operation: Operation{
-									Cursor: Cursor{
-										Value: "scroll:foobar",
-									},
-								},
-							},
-						},
+						Entry:            sqCursorBottomEntry,
 					},
 				},
 			},
@@ -79,26 +85,8 @@ func TestFindCursorWhenAddEntriesExist(t *testing.T) {
 				Instruction{
 					AddEntries: AddEntries{
 						Entries: []Entry{
-							Entry{
-								EntryId: "sq-cursor-top",
-								Content: Content{
-									Operation: Operation{
-										Cursor: Cursor{
-											Value: "refresh:foobar",
-										},
-									},
-								},
-							},
-							Entry{
-								EntryId: "sq-cursor-bottom",
-								Content: Content{
-									Operation: Operation{
-										Cursor: Cursor{
-											Value: "scroll:foobar",
-										},
-									},
-								},
-							},
+							sqCursorTopEntry,
+							sqCursorBottomEntry,
 						},
 					},
 				},
