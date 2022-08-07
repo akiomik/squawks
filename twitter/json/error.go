@@ -16,6 +16,7 @@ package json
 
 import (
 	"fmt"
+	"strings"
 )
 
 type Error struct {
@@ -33,5 +34,5 @@ func (res *ErrorResponse) Error() string {
 		message += fmt.Sprintf("%d: %s\n", e.Code, e.Message)
 	}
 
-	return message
+	return strings.TrimRight(message, "\n")
 }

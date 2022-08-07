@@ -25,10 +25,11 @@ func TestError(t *testing.T) {
 	err := ErrorResponse{
 		Errors: []Error{
 			Error{Code: 200, Message: "forbidden"},
+			Error{Code: 400, Message: "something went wrong"},
 		},
 	}
 
-	expected := "200: forbidden\n"
+	expected := "200: forbidden\n400: something went wrong"
 	actual := err.Error()
 	if actual != expected {
 		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
