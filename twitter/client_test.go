@@ -63,56 +63,60 @@ func TestRequest(t *testing.T) {
 	}
 }
 
-func TestGetGuestTokenSuccess(t *testing.T) {
-	c := NewClient()
-
-	httpmock.ActivateNonDefault(c.Client.GetClient())
-	defer httpmock.DeactivateAndReset()
-
-	url := "https://api.twitter.com/1.1/guest/activate.json"
-	res := `{ "guest_token": "deadbeef" }`
-	httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
-		res := httpmock.NewStringResponse(200, res)
-		res.Header.Add("Content-Type", "application/json")
-		return res, nil
-	})
-
-	actual, err := c.GetGuestToken()
-	if err != nil {
-		t.Errorf("Expect nil, got %v", err)
-		return
+func TestGetGuestToken(t *testing.T) {
+	examples := map[string]struct {
+		statusCode int
+		response   string
+		expected   string
+		errored    bool
+	}{
+		"success": {
+			statusCode: 200,
+			response:   `{ "guest_token": "deadbeef" }`,
+			expected:   "deadbeef",
+			errored:    false,
+		},
+		"failure": {
+			statusCode: 403,
+			response:   `{ "errors": [{ "code": 200, "message": "forbidden" }] }`,
+			expected:   "",
+			errored:    true,
+		},
 	}
 
-	expected := "deadbeef"
-	if actual != expected {
-		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
-		return
-	}
-}
+	for name, e := range examples {
+		t.Run(name, func(t *testing.T) {
+			c := NewClient()
 
-func TestGetGuestTokenFailure(t *testing.T) {
-	c := NewClient()
+			httpmock.ActivateNonDefault(c.Client.GetClient())
+			defer httpmock.DeactivateAndReset()
 
-	httpmock.ActivateNonDefault(c.Client.GetClient())
-	defer httpmock.DeactivateAndReset()
+			url := "https://api.twitter.com/1.1/guest/activate.json"
+			httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+				res := httpmock.NewStringResponse(e.statusCode, e.response)
+				res.Header.Add("Content-Type", "application/json")
+				return res, nil
+			})
 
-	url := "https://api.twitter.com/1.1/guest/activate.json"
-	res := `{ "errors": [{ "code": 200, "message": "forbidden" }] }`
-	httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
-		res := httpmock.NewStringResponse(403, res)
-		res.Header.Add("Content-Type", "application/json")
-		return res, nil
-	})
+			actual, err := c.GetGuestToken()
+			if e.errored != (err != nil) {
+				t.Errorf("Expect error %v, got %v", e.errored, err)
+				return
+			}
 
-	actual, err := c.GetGuestToken()
-	if err == nil {
-		t.Errorf("Expect error objects, got nil")
-		return
-	}
+			if actual != e.expected {
+				t.Errorf(`Expect "%s", got "%s"`, e.expected, actual)
+				return
+			}
 
-	if actual != "" {
-		t.Errorf(`Expect "", got "%s"`, actual)
-		return
+			httpmock.GetTotalCallCount()
+			info := httpmock.GetCallCountInfo()
+
+			if info["POST "+url] != 1 {
+				t.Errorf("The request POST %s was expected to execute once, but it executed %d time(s)", url, info["POST "+url])
+				return
+			}
+		})
 	}
 }
 
@@ -330,17 +334,17 @@ func TestSearchAll(t *testing.T) {
 						return
 					}
 				} else {
-          if expected.Error == nil {
-            if actual.Error != nil {
-              t.Errorf(`Expect nil, got "%v"`, actual.Error)
-              return
-            }
-          } else {
-            if actual.Error.Error() != expected.Error.Error() {
-              t.Errorf(`Expect "%s", got "%s"`, expected.Error.Error(), actual.Error.Error())
-              return
-            }
-          }
+					if expected.Error == nil {
+						if actual.Error != nil {
+							t.Errorf(`Expect nil, got "%v"`, actual.Error)
+							return
+						}
+					} else {
+						if actual.Error.Error() != expected.Error.Error() {
+							t.Errorf(`Expect "%s", got "%s"`, expected.Error.Error(), actual.Error.Error())
+							return
+						}
+					}
 
 					if !reflect.DeepEqual(actual.Adaptive, expected.Adaptive) {
 						t.Errorf("Expect %+v, got %+v", expected.Adaptive, actual.Adaptive)
