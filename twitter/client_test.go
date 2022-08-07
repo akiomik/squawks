@@ -416,3 +416,157 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 		return
 	}
 }
+
+func TestSearchAllWhenFailedToGetGuestToken(t *testing.T) {
+	c := NewClient()
+
+	httpmock.ActivateNonDefault(c.Client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	url1 := "https://api.twitter.com/1.1/guest/activate.json"
+	httpmock.RegisterResponder("POST", url1, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(403, `{ "errors": [{ "code": 200, "message": "forbidden" }] }`)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
+
+	q := Query{Text: "foo"}
+	opts := &SearchOptions{Query: q}
+	ch := c.SearchAll(opts)
+
+	actual1 := <-ch
+	if actual1.Error == nil {
+		t.Errorf("Expect error object first, got nil")
+		return
+	}
+
+	if actual1.Adaptive != nil {
+		t.Errorf("Expect nil first, got %+v", actual1.Adaptive)
+		return
+	}
+
+	actual2 := <-ch
+	if actual2 != nil {
+		t.Errorf("Expect nil second, got %+v", actual2)
+		return
+	}
+
+	httpmock.GetTotalCallCount()
+	info := httpmock.GetCallCountInfo()
+
+	if info["POST "+url1] != 1 {
+		t.Errorf("The request POST %s was expected to execute once, but it executed %d time(s)", url1, info["POST "+url1])
+		return
+	}
+}
+
+func TestSearchAllWhenRetryLimitExceeded(t *testing.T) {
+	c := NewClient()
+
+	httpmock.ActivateNonDefault(c.Client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	url1 := "https://api.twitter.com/1.1/guest/activate.json"
+	httpmock.RegisterResponder("POST", url1, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(200, `{ "guest_token": "1234" }`)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
+
+	url2 := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
+	httpmock.RegisterResponder("GET", url2, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(403, `{ "errors": [{ "code": 200, "message": "forbidden" }] }`)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
+
+	q := Query{Text: "foo"}
+	opts := &SearchOptions{Query: q}
+	ch := c.SearchAll(opts)
+
+	actual1 := <-ch
+	if actual1.Error == nil {
+		t.Errorf("Expect error object first, got nil")
+		return
+	}
+
+	if actual1.Adaptive != nil {
+		t.Errorf("Expect nil first, got %+v", actual1.Adaptive)
+		return
+	}
+
+	actual2 := <-ch
+	if actual2 != nil {
+		t.Errorf("Expect nil second, got %+v", actual2)
+		return
+	}
+
+	httpmock.GetTotalCallCount()
+	info := httpmock.GetCallCountInfo()
+
+	if info["POST "+url1] != int(c.MaxRetryAttempts+1) {
+		t.Errorf("The request POST %s was expected to execute %d times, but it executed %d time(s)", url1, c.MaxRetryAttempts+1, info["POST "+url1])
+		return
+	}
+
+	if info["GET "+url2] != int(c.MaxRetryAttempts+1) {
+		t.Errorf("The request GET %s was expected to execute %d times, but it executed %d time(s)", url2, c.MaxRetryAttempts+1, info["GET "+url2])
+		return
+	}
+}
+
+func TestSearchAllWhenMaxRetryAttempts0(t *testing.T) {
+	c := NewClient()
+	c.MaxRetryAttempts = 0
+
+	httpmock.ActivateNonDefault(c.Client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	url1 := "https://api.twitter.com/1.1/guest/activate.json"
+	httpmock.RegisterResponder("POST", url1, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(200, `{ "guest_token": "1234" }`)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
+
+	url2 := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
+	httpmock.RegisterResponder("GET", url2, func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(403, `{ "errors": [{ "code": 200, "message": "forbidden" }] }`)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	})
+
+	q := Query{Text: "foo"}
+	opts := &SearchOptions{Query: q}
+	ch := c.SearchAll(opts)
+
+	actual1 := <-ch
+	if actual1.Error == nil {
+		t.Errorf("Expect error object first, got nil")
+		return
+	}
+
+	if actual1.Adaptive != nil {
+		t.Errorf("Expect nil first, got %+v", actual1.Adaptive)
+		return
+	}
+
+	actual2 := <-ch
+	if actual2 != nil {
+		t.Errorf("Expect nil second, got %+v", actual2)
+		return
+	}
+
+	httpmock.GetTotalCallCount()
+	info := httpmock.GetCallCountInfo()
+
+	if info["POST "+url1] != 1 {
+		t.Errorf("The request POST %s was expected to execute once, but it executed %d time(s)", url1, info["POST "+url1])
+		return
+	}
+
+	if info["GET "+url2] != 1 {
+		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url2, info["GET "+url2])
+		return
+	}
+}
