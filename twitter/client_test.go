@@ -29,6 +29,14 @@ import (
 	"github.com/akiomik/get-old-tweets/twitter/json"
 )
 
+func NewJsonResponse(code int, body string) func(req *http.Request) (*http.Response, error) {
+	return func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(code, body)
+		res.Header.Add("Content-Type", "application/json")
+		return res, nil
+	}
+}
+
 func TestNewClient(t *testing.T) {
 	c := NewClient()
 
@@ -92,11 +100,7 @@ func TestGetGuestToken(t *testing.T) {
 			defer httpmock.DeactivateAndReset()
 
 			url := "https://api.twitter.com/1.1/guest/activate.json"
-			httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
-				res := httpmock.NewStringResponse(e.statusCode, e.response)
-				res.Header.Add("Content-Type", "application/json")
-				return res, nil
-			})
+			httpmock.RegisterResponder("POST", url, NewJsonResponse(e.statusCode, e.response))
 
 			actual, err := c.GetGuestToken()
 			if e.errored != (err != nil) {
@@ -127,12 +131,7 @@ func TestSearchWhenWithoutCursor(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
 	url := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
-	res := `{ "globalObjects": { "tweets": {}, "users": {} } }`
-	httpmock.RegisterResponder("GET", url, func(req *http.Request) (*http.Response, error) {
-		res := httpmock.NewStringResponse(200, res)
-		res.Header.Add("Content-Type", "application/json")
-		return res, nil
-	})
+	httpmock.RegisterResponder("GET", url, NewJsonResponse(200, `{ "globalObjects": { "tweets": {}, "users": {} } }`))
 
 	q := Query{Text: "foo"}
 	opts := &SearchOptions{Query: q, GuestToken: "", Cursor: ""}
@@ -164,12 +163,7 @@ func TestSearchWhenWithCursor(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
 	url := "https://twitter.com/i/api/2/search/adaptive.json?count=40&cursor=scroll%3Adeadbeef&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
-	res := `{ "globalObjects": { "tweets": {}, "users": {} } }`
-	httpmock.RegisterResponder("GET", url, func(req *http.Request) (*http.Response, error) {
-		res := httpmock.NewStringResponse(200, res)
-		res.Header.Add("Content-Type", "application/json")
-		return res, nil
-	})
+	httpmock.RegisterResponder("GET", url, NewJsonResponse(200, `{ "globalObjects": { "tweets": {}, "users": {} } }`))
 
 	q := Query{Text: "foo"}
 	opts := &SearchOptions{Query: q, GuestToken: "", Cursor: "scroll:deadbeef"}
@@ -201,12 +195,7 @@ func TestSearchWhenError(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
 	url := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
-	res := `{ "errors": [{ "code": 200, "message": "forbidden" }] }`
-	httpmock.RegisterResponder("GET", url, func(req *http.Request) (*http.Response, error) {
-		res := httpmock.NewStringResponse(403, res)
-		res.Header.Add("Content-Type", "application/json")
-		return res, nil
-	})
+	httpmock.RegisterResponder("GET", url, NewJsonResponse(403, `{ "errors": [{ "code": 200, "message": "forbidden" }] }`))
 
 	q := Query{Text: "foo"}
 	opts := &SearchOptions{Query: q, GuestToken: "", Cursor: ""}
@@ -307,18 +296,10 @@ func TestSearchAll(t *testing.T) {
 			defer httpmock.DeactivateAndReset()
 
 			url1 := "https://api.twitter.com/1.1/guest/activate.json"
-			httpmock.RegisterResponder("POST", url1, func(req *http.Request) (*http.Response, error) {
-				res := httpmock.NewStringResponse(e.activateStatusCode, e.activateResponse)
-				res.Header.Add("Content-Type", "application/json")
-				return res, nil
-			})
+			httpmock.RegisterResponder("POST", url1, NewJsonResponse(e.activateStatusCode, e.activateResponse))
 
 			url2 := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
-			httpmock.RegisterResponder("GET", url2, func(req *http.Request) (*http.Response, error) {
-				res := httpmock.NewStringResponse(e.adaptiveStatsCode, e.adaptiveResponse)
-				res.Header.Add("Content-Type", "application/json")
-				return res, nil
-			})
+			httpmock.RegisterResponder("GET", url2, NewJsonResponse(e.adaptiveStatsCode, e.adaptiveResponse))
 
 			q := Query{Text: "foo"}
 			opts := &SearchOptions{Query: q}
@@ -376,11 +357,7 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
 	url1 := "https://api.twitter.com/1.1/guest/activate.json"
-	httpmock.RegisterResponder("POST", url1, func(req *http.Request) (*http.Response, error) {
-		res := httpmock.NewStringResponse(200, `{ "guest_token": "1234" }`)
-		res.Header.Add("Content-Type", "application/json")
-		return res, nil
-	})
+	httpmock.RegisterResponder("POST", url1, NewJsonResponse(200, `{ "guest_token": "1234" }`))
 
 	url2 := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
 	res2 := `{
@@ -408,18 +385,10 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
       }]
     }
   }`
-	httpmock.RegisterResponder("GET", url2, func(req *http.Request) (*http.Response, error) {
-		res := httpmock.NewStringResponse(200, res2)
-		res.Header.Add("Content-Type", "application/json")
-		return res, nil
-	})
+	httpmock.RegisterResponder("GET", url2, NewJsonResponse(200, res2))
 
 	url3 := "https://twitter.com/i/api/2/search/adaptive.json?count=40&cursor=scroll%3Adeadbeef&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
-	httpmock.RegisterResponder("GET", url3, func(req *http.Request) (*http.Response, error) {
-		res := httpmock.NewStringResponse(200, `{}`)
-		res.Header.Add("Content-Type", "application/json")
-		return res, nil
-	})
+	httpmock.RegisterResponder("GET", url3, NewJsonResponse(200, `{}`))
 
 	q := Query{Text: "foo"}
 	opts := &SearchOptions{Query: q}
