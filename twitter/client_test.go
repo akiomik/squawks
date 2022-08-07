@@ -124,101 +124,69 @@ func TestGetGuestToken(t *testing.T) {
 	}
 }
 
-func TestSearchWhenWithoutCursor(t *testing.T) {
-	c := NewClient()
-
-	httpmock.ActivateNonDefault(c.Client.GetClient())
-	defer httpmock.DeactivateAndReset()
-
-	url := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
-	httpmock.RegisterResponder("GET", url, NewJsonResponse(200, `{ "globalObjects": { "tweets": {}, "users": {} } }`))
-
-	q := Query{Text: "foo"}
-	opts := &SearchOptions{Query: q, GuestToken: "", Cursor: ""}
-	actual, err := c.Search(opts)
-	if err != nil {
-		t.Errorf("Expect nil, got %v", err)
-		return
+func TestSearch(t *testing.T) {
+	examples := map[string]struct {
+		opts       *SearchOptions
+		url        string
+		statusCode int
+		response   string
+		expected   *json.Adaptive
+		errored    bool
+	}{
+		"without-cursor": {
+			opts:       &SearchOptions{Query: Query{Text: "foo"}, GuestToken: "", Cursor: ""},
+			url:        "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live",
+			statusCode: 200,
+			response:   `{ "globalObjects": { "tweets": {}, "users": {} } }`,
+			expected:   &json.Adaptive{GlobalObjects: json.GlobalObjects{Tweets: map[string]json.Tweet{}, Users: map[string]json.User{}}},
+			errored:    false,
+		},
+		"with-cursor": {
+			opts:       &SearchOptions{Query: Query{Text: "foo"}, GuestToken: "", Cursor: "scroll:deadbeef"},
+			url:        "https://twitter.com/i/api/2/search/adaptive.json?count=40&cursor=scroll%3Adeadbeef&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live",
+			statusCode: 200,
+			response:   `{ "globalObjects": { "tweets": {}, "users": {} } }`,
+			expected:   &json.Adaptive{GlobalObjects: json.GlobalObjects{Tweets: map[string]json.Tweet{}, Users: map[string]json.User{}}},
+			errored:    false,
+		},
+		"failure": {
+			opts:       &SearchOptions{Query: Query{Text: "foo"}, GuestToken: "", Cursor: ""},
+			url:        "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live",
+			statusCode: 403,
+			response:   `{ "errors": [{ "code": 200, "message": "forbidden" }] }`,
+			expected:   nil,
+			errored:    true,
+		},
 	}
 
-	expected := json.Adaptive{GlobalObjects: json.GlobalObjects{Tweets: map[string]json.Tweet{}, Users: map[string]json.User{}}}
-	if !reflect.DeepEqual(*actual, expected) {
-		t.Errorf("Expect %+v, got %+v", expected, *actual)
-		return
-	}
+	for name, e := range examples {
+		t.Run(name, func(t *testing.T) {
+			c := NewClient()
 
-	httpmock.GetTotalCallCount()
-	info := httpmock.GetCallCountInfo()
+			httpmock.ActivateNonDefault(c.Client.GetClient())
+			defer httpmock.DeactivateAndReset()
 
-	if info["GET "+url] != 1 {
-		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url, info["GET "+url])
-		return
-	}
-}
+			httpmock.RegisterResponder("GET", e.url, NewJsonResponse(e.statusCode, e.response))
 
-func TestSearchWhenWithCursor(t *testing.T) {
-	c := NewClient()
+			actual, err := c.Search(e.opts)
+			if e.errored != (err != nil) {
+				t.Errorf("Expect error %v, got %v", e.errored, err)
+				return
+			}
 
-	httpmock.ActivateNonDefault(c.Client.GetClient())
-	defer httpmock.DeactivateAndReset()
+			if !reflect.DeepEqual(actual, e.expected) {
+				t.Errorf("Expect %+v, got %+v", e.expected, actual)
+				return
+			}
 
-	url := "https://twitter.com/i/api/2/search/adaptive.json?count=40&cursor=scroll%3Adeadbeef&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
-	httpmock.RegisterResponder("GET", url, NewJsonResponse(200, `{ "globalObjects": { "tweets": {}, "users": {} } }`))
+			httpmock.GetTotalCallCount()
+			info := httpmock.GetCallCountInfo()
 
-	q := Query{Text: "foo"}
-	opts := &SearchOptions{Query: q, GuestToken: "", Cursor: "scroll:deadbeef"}
-	actual, err := c.Search(opts)
-	if err != nil {
-		t.Errorf("Expect nil, got %v", err)
-		return
-	}
-
-	expected := json.Adaptive{GlobalObjects: json.GlobalObjects{Tweets: map[string]json.Tweet{}, Users: map[string]json.User{}}}
-	if !reflect.DeepEqual(*actual, expected) {
-		t.Errorf("Expect %+v, got %+v", expected, *actual)
-		return
-	}
-
-	httpmock.GetTotalCallCount()
-	info := httpmock.GetCallCountInfo()
-
-	if info["GET "+url] != 1 {
-		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url, info["GET "+url])
-		return
-	}
-}
-
-func TestSearchWhenError(t *testing.T) {
-	c := NewClient()
-
-	httpmock.ActivateNonDefault(c.Client.GetClient())
-	defer httpmock.DeactivateAndReset()
-
-	url := "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live"
-	httpmock.RegisterResponder("GET", url, NewJsonResponse(403, `{ "errors": [{ "code": 200, "message": "forbidden" }] }`))
-
-	q := Query{Text: "foo"}
-	opts := &SearchOptions{Query: q, GuestToken: "", Cursor: ""}
-	actualAdaptive, err := c.Search(opts)
-
-	expectedError := json.ErrorResponse{Errors: []json.Error{json.Error{Code: 200, Message: "forbidden"}}}
-	actualError, ok := err.(*json.ErrorResponse)
-	if !ok || !reflect.DeepEqual(*actualError, expectedError) {
-		t.Errorf("Expect %+v, got %+v", expectedError, *actualError)
-		return
-	}
-
-	if actualAdaptive != nil {
-		t.Errorf("Expect nil, got %+v", actualAdaptive)
-		return
-	}
-
-	httpmock.GetTotalCallCount()
-	info := httpmock.GetCallCountInfo()
-
-	if info["GET "+url] != 1 {
-		t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", url, info["GET "+url])
-		return
+			if info["GET "+e.url] != 1 {
+				t.Errorf("The request GET %s was expected to execute once, but it executed %d time(s)", e.url, info["GET "+e.url])
+				return
+			}
+		})
 	}
 }
 
