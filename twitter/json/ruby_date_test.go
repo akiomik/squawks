@@ -66,35 +66,38 @@ func TestEqual(t *testing.T) {
 	}
 }
 
-func TestUnmarshallWhenSucceeded(t *testing.T) {
-	jsonString := `{
-    "created_at": "Mon Aug 19 02:04:28 +0000 2013"
-  }`
-
-	schema := new(TestSchema)
-	err := json.Unmarshal([]byte(jsonString), &schema)
-	if err != nil {
-		t.Errorf("Expect nil, got %v", err)
-		return
+func TestUnmarshall(t *testing.T) {
+	examples := map[string]struct {
+		jsonString string
+		expected   RubyDate
+		errored    bool
+	}{
+		"success": {
+			jsonString: `{ "created_at": "Mon Aug 19 02:04:28 +0000 2013" }`,
+			expected:   RubyDate(time.Date(2013, 8, 19, 2, 4, 28, 0, time.UTC)),
+			errored:    false,
+		},
+		"failure": {
+			jsonString: `{ "created_at": "2013-01-08-19T02:04:28+00:00" }`,
+			expected:   RubyDate(time.Time{}),
+			errored:    true,
+		},
 	}
 
-	expected := RubyDate(time.Date(2013, 8, 19, 2, 4, 28, 0, time.UTC))
-	actual := schema.CreatedAt
-	if !actual.Equal(expected) {
-		t.Errorf("Expect %v, got %v", expected, actual)
-		return
-	}
-}
+	for name, e := range examples {
+		t.Run(name, func(t *testing.T) {
+			schema := new(TestSchema)
+			err := json.Unmarshal([]byte(e.jsonString), &schema)
+			if e.errored != (err != nil) {
+				t.Errorf("Expect error %v, got %v", e.errored, err)
+				return
+			}
 
-func TestUnmarshallWhenFailed(t *testing.T) {
-	jsonString := `{
-    "created_at": "2013-01-08-19T02:04:28+00:00"
-  }`
-
-	schema := new(TestSchema)
-	err := json.Unmarshal([]byte(jsonString), &schema)
-	if err == nil {
-		t.Errorf("Expect error object, got nil")
-		return
+			actual := schema.CreatedAt
+			if !actual.Equal(e.expected) {
+				t.Errorf("Expect %v, got %v", e.expected, actual)
+				return
+			}
+		})
 	}
 }
