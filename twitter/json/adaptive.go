@@ -32,8 +32,22 @@ type Operation struct {
 	Cursor Cursor `json:"cursor"`
 }
 
+type ContentTweet struct {
+	Id          string `json":id"`
+	DisplayType string `json:"displayType"`
+}
+
+type ItemContent struct {
+	Tweet ContentTweet `json:"tweet"`
+}
+
+type Item struct {
+	Content ItemContent `json:"content"`
+}
+
 type Content struct {
 	Operation Operation `json:"operation"`
+	Item      Item      `json:"item"`
 }
 
 type Entry struct {

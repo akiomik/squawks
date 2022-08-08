@@ -15,7 +15,9 @@
 package export
 
 import (
+	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/akiomik/get-old-tweets/twitter/json"
@@ -36,13 +38,32 @@ type Record struct {
 	Source        string
 }
 
-func NewRecordsFromAdaptive(j *json.Adaptive) []Record {
-	l := make([]Record, len(j.GlobalObjects.Tweets))
+func ReverseSortedTweetIds(j *json.Adaptive) []string {
+	is := j.Timeline.Instructions
+	if len(is) == 0 {
+		return make([]string, 0)
+	}
 
-	for i, k := range ReversedKeysOf(j.GlobalObjects.Tweets) {
-		t := j.GlobalObjects.Tweets[k]
+	es := Filter(is[0].AddEntries.Entries, func(e json.Entry) bool {
+		return strings.HasPrefix(e.EntryId, "sq-I-t-") &&
+			len(e.Content.Item.Content.Tweet.Id) != 0 &&
+			e.Content.Item.Content.Tweet.DisplayType == "Tweet"
+	})
+
+	sort.Slice(es, func(i int, j int) bool {
+		return es[i].SortIndex > es[j].SortIndex
+	})
+
+	return Map(es, func(e json.Entry) string {
+		return e.Content.Item.Content.Tweet.Id
+	})
+}
+
+func NewRecordsFromAdaptive(j *json.Adaptive) []Record {
+	return Map(ReverseSortedTweetIds(j), func(id string) Record {
+		t := j.GlobalObjects.Tweets[id]
 		u := j.GlobalObjects.Users[strconv.FormatUint(t.UserId, 10)]
-		l[i] = Record{
+		return Record{
 			Id:            t.Id,
 			Username:      u.ScreenName,
 			CreatedAt:     Iso8601Date(time.Time(t.CreatedAt)),
@@ -56,7 +77,5 @@ func NewRecordsFromAdaptive(j *json.Adaptive) []Record {
 			Lang:          t.Lang,
 			Source:        t.Source,
 		}
-	}
-
-	return l
+	})
 }

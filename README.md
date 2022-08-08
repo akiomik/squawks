@@ -18,12 +18,13 @@ Usage:
 Flags:
       --filter string       find tweets by type of account (e.g. verified)
       --from string         find tweets sent from a certain user
-      --lang string         find tweets by a certain language (e.g. en, es, fr)
   -h, --help                help for get-old-tweets
+      --lang string         find tweets by a certain language (e.g. en, es, fr)
   -o, --out string          output csv filename (required)
   -q, --query string        query text to search
       --since string        find tweets since a certain day (e.g. 2014-07-21)
       --to string           find tweets sent in reply to a certain user
+      --top                 find top tweets
       --until string        find tweets until a certain day (e.g. 2020-09-06)
       --user-agent string   set custom user-agent
   -v, --version             version for get-old-tweets
@@ -47,6 +48,12 @@ Get tweets by username and bound dates:
 
 ```sh
 get-old-tweets --from 'barackobama' --since 2015-09-10 --until 2015-09-12 -o out.csv
+```
+
+Get the last 10 top tweets by username:
+
+```sh
+get-old-tweets --from 'barackobama' --top
 ```
 
 ## Output CSV schema

@@ -47,3 +47,24 @@ func ReversedKeysOf(m map[string]json.Tweet) []string {
 	sort.Sort(sort.Reverse(sort.StringSlice(ks)))
 	return ks
 }
+
+func Filter[A any](xs []A, f func(A) bool) []A {
+	acc := []A{}
+
+	for _, x := range xs {
+		if f(x) {
+			acc = append(acc, x)
+		}
+	}
+
+	return acc
+}
+
+func Map[A any, B any](xs []A, f func(A) B) []B {
+	newXs := make([]B, len(xs))
+	for i, x := range xs {
+		newXs[i] = f(x)
+	}
+
+	return newXs
+}

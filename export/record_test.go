@@ -22,6 +22,107 @@ import (
 	"github.com/akiomik/get-old-tweets/twitter/json"
 )
 
+func TestReverseSortedTweetIdsWhenInstructionsAreEmpty(t *testing.T) {
+	j := &json.Adaptive{
+		Timeline: json.Timeline{
+			Instructions: []json.Instruction{},
+		},
+	}
+
+	expected := []string{}
+	actual := ReverseSortedTweetIds(j)
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("Expect %v, got %v", expected, actual)
+		return
+	}
+}
+
+func TestReverseSortedTweetIdsWhenInstructionsAreNotEmpty(t *testing.T) {
+	j := &json.Adaptive{
+		Timeline: json.Timeline{
+			Instructions: []json.Instruction{
+				json.Instruction{
+					AddEntries: json.AddEntries{
+						Entries: []json.Entry{
+							json.Entry{
+								EntryId:   "sq-I-t-300",
+								SortIndex: "999990",
+								Content: json.Content{
+									Item: json.Item{
+										Content: json.ItemContent{
+											Tweet: json.ContentTweet{
+												Id:          "300",
+												DisplayType: "Tweet",
+											},
+										},
+									},
+								},
+							},
+							json.Entry{
+								EntryId:   "sq-I-t-100",
+								SortIndex: "999980",
+								Content: json.Content{
+									Item: json.Item{
+										Content: json.ItemContent{
+											Tweet: json.ContentTweet{
+												Id:          "100",
+												DisplayType: "Tweet",
+											},
+										},
+									},
+								},
+							},
+							json.Entry{
+								EntryId:   "sq-I-t-200",
+								SortIndex: "999970",
+								Content: json.Content{
+									Item: json.Item{
+										Content: json.ItemContent{
+											Tweet: json.ContentTweet{
+												Id:          "200",
+												DisplayType: "Tweet",
+											},
+										},
+									},
+								},
+							},
+							json.Entry{
+								EntryId:   "sq-cursor-top",
+								SortIndex: "999999",
+								Content: json.Content{
+									Operation: json.Operation{
+										Cursor: json.Cursor{
+											Value: "refresh:foobar",
+										},
+									},
+								},
+							},
+							json.Entry{
+								EntryId:   "sq-cursor-bottom",
+								SortIndex: "0",
+								Content: json.Content{
+									Operation: json.Operation{
+										Cursor: json.Cursor{
+											Value: "scroll:foobar",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	expected := []string{"300", "100", "200"}
+	actual := ReverseSortedTweetIds(j)
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("Expect %v, got %v", expected, actual)
+		return
+	}
+}
+
 func TestNewRecordsFromAdaptive(t *testing.T) {
 	j := json.Adaptive{
 		GlobalObjects: json.GlobalObjects{
@@ -59,6 +160,44 @@ func TestNewRecordsFromAdaptive(t *testing.T) {
 					Id:         200,
 					Name:       "Watson",
 					ScreenName: "watson2",
+				},
+			},
+		},
+		Timeline: json.Timeline{
+			Instructions: []json.Instruction{
+				json.Instruction{
+					AddEntries: json.AddEntries{
+						Entries: []json.Entry{
+							json.Entry{
+								EntryId:   "sq-I-t-1000",
+								SortIndex: "999990",
+								Content: json.Content{
+									Item: json.Item{
+										Content: json.ItemContent{
+											Tweet: json.ContentTweet{
+												Id:          "1000",
+												DisplayType: "Tweet",
+											},
+										},
+									},
+								},
+							},
+							json.Entry{
+								EntryId:   "sq-I-t-100",
+								SortIndex: "999980",
+								Content: json.Content{
+									Item: json.Item{
+										Content: json.ItemContent{
+											Tweet: json.ContentTweet{
+												Id:          "100",
+												DisplayType: "Tweet",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},

@@ -33,6 +33,7 @@ var (
 	to        string
 	lang      string
 	filter    string
+	top       bool
 	userAgent string
 )
 
@@ -71,7 +72,7 @@ var rootCmd = &cobra.Command{
 		go func() {
 			defer close(ch)
 
-			opts := &twitter.SearchOptions{Query: q}
+			opts := twitter.SearchOptions{Query: q, Top: top}
 			for res := range client.SearchAll(opts) {
 				if res.Error != nil {
 					fmt.Fprintln(os.Stderr, "Error: %w", res.Error)
@@ -94,6 +95,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&text, "query", "q", "", "query text to search")
 	rootCmd.Flags().StringVarP(&since, "since", "", "", "find tweets since a certain day (e.g. 2014-07-21)")
 	rootCmd.Flags().StringVarP(&to, "to", "", "", "find tweets sent in reply to a certain user")
+	rootCmd.Flags().BoolVarP(&top, "top", "", false, "find top tweets")
 	rootCmd.Flags().StringVarP(&until, "until", "", "", "find tweets until a certain day (e.g. 2020-09-06)")
 	rootCmd.Flags().StringVarP(&userAgent, "user-agent", "", "", "set custom user-agent")
 	rootCmd.MarkFlagRequired("out")

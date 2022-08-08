@@ -75,6 +75,7 @@ type SearchOptions struct {
 	GuestToken string
 	Cursor     string
 	Query      Query
+	Top        bool
 }
 
 func (c *Client) Search(opts *SearchOptions) (*json.Adaptive, error) {
@@ -85,11 +86,14 @@ func (c *Client) Search(opts *SearchOptions) (*json.Adaptive, error) {
 		"tweet_mode":          "extended",
 		"count":               "40",
 		"query_source":        "typed_query",
-		"tweet_search_mode":   "live",
 	}
 
 	if len(opts.Cursor) != 0 {
 		params["cursor"] = opts.Cursor
+	}
+
+	if !opts.Top {
+		params["tweet_search_mode"] = "live"
 	}
 
 	res, err := c.Request().
@@ -115,7 +119,7 @@ type SearchResult struct {
 	Error    error
 }
 
-func (c *Client) SearchAll(opts *SearchOptions) <-chan *SearchResult {
+func (c *Client) SearchAll(opts SearchOptions) <-chan *SearchResult {
 	ch := make(chan *SearchResult)
 
 	go func() {
@@ -136,8 +140,9 @@ func (c *Client) SearchAll(opts *SearchOptions) <-chan *SearchResult {
 				guestToken = newGuestToken
 			}
 
-			newOpts := &SearchOptions{Query: opts.Query, Cursor: cursor, GuestToken: guestToken}
-			res, err := c.Search(newOpts)
+			opts.GuestToken = guestToken
+			opts.Cursor = cursor
+			res, err := c.Search(&opts)
 
 			if err != nil {
 				// TODO: check error code

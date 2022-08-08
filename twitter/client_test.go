@@ -134,7 +134,7 @@ func TestSearch(t *testing.T) {
 		errored    bool
 	}{
 		"without-cursor": {
-			opts:       &SearchOptions{Query: Query{Text: "foo"}, GuestToken: "", Cursor: ""},
+			opts:       &SearchOptions{Query: Query{Text: "foo"}},
 			url:        "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live",
 			statusCode: 200,
 			response:   `{ "globalObjects": { "tweets": {}, "users": {} } }`,
@@ -142,7 +142,7 @@ func TestSearch(t *testing.T) {
 			errored:    false,
 		},
 		"with-cursor": {
-			opts:       &SearchOptions{Query: Query{Text: "foo"}, GuestToken: "", Cursor: "scroll:deadbeef"},
+			opts:       &SearchOptions{Query: Query{Text: "foo"}, Cursor: "scroll:deadbeef"},
 			url:        "https://twitter.com/i/api/2/search/adaptive.json?count=40&cursor=scroll%3Adeadbeef&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live",
 			statusCode: 200,
 			response:   `{ "globalObjects": { "tweets": {}, "users": {} } }`,
@@ -150,12 +150,20 @@ func TestSearch(t *testing.T) {
 			errored:    false,
 		},
 		"failure": {
-			opts:       &SearchOptions{Query: Query{Text: "foo"}, GuestToken: "", Cursor: ""},
+			opts:       &SearchOptions{Query: Query{Text: "foo"}},
 			url:        "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended&tweet_search_mode=live",
 			statusCode: 403,
 			response:   `{ "errors": [{ "code": 200, "message": "forbidden" }] }`,
 			expected:   nil,
 			errored:    true,
+		},
+		"top": {
+			opts:       &SearchOptions{Query: Query{Text: "foo"}, Top: true},
+			url:        "https://twitter.com/i/api/2/search/adaptive.json?count=40&include_quote_count=true&include_reply_count=1&q=foo&query_source=typed_query&tweet_mode=extended",
+			statusCode: 200,
+			response:   `{ "globalObjects": { "tweets": {}, "users": {} } }`,
+			expected:   &json.Adaptive{GlobalObjects: json.GlobalObjects{Tweets: map[string]json.Tweet{}, Users: map[string]json.User{}}},
+			errored:    false,
 		},
 	}
 
@@ -270,7 +278,7 @@ func TestSearchAll(t *testing.T) {
 			httpmock.RegisterResponder("GET", url2, NewJsonResponse(e.adaptiveStatsCode, e.adaptiveResponse))
 
 			q := Query{Text: "foo"}
-			opts := &SearchOptions{Query: q}
+			opts := SearchOptions{Query: q}
 			ch := c.SearchAll(opts)
 
 			for _, expected := range e.expectedResults {
@@ -359,7 +367,7 @@ func TestSearchAllWhenRestTweetsExist(t *testing.T) {
 	httpmock.RegisterResponder("GET", url3, NewJsonResponse(200, `{}`))
 
 	q := Query{Text: "foo"}
-	opts := &SearchOptions{Query: q}
+	opts := SearchOptions{Query: q}
 	ch := c.SearchAll(opts)
 
 	actual1 := <-ch

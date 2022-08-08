@@ -110,3 +110,76 @@ func TestReversedKeysOf(t *testing.T) {
 		return
 	}
 }
+
+func TestFilter(t *testing.T) {
+	examples := map[string]struct {
+		input    []int
+		f        func(n int) bool
+		expected []int
+	}{
+		"even": {
+			input:    []int{1, 2, 3, 4, 5},
+			f:        func(n int) bool { return n%2 == 0 },
+			expected: []int{2, 4},
+		},
+		"odd": {
+			input:    []int{1, 2, 3, 4, 5},
+			f:        func(n int) bool { return n%2 == 1 },
+			expected: []int{1, 3, 5},
+		},
+		"empty": {
+			input:    []int{},
+			f:        func(n int) bool { return n%2 == 0 },
+			expected: []int{},
+		},
+		"noop": {
+			input:    []int{1, 2, 3, 4, 5},
+			f:        func(n int) bool { return true },
+			expected: []int{1, 2, 3, 4, 5},
+		},
+	}
+
+	for name, e := range examples {
+		t.Run(name, func(t *testing.T) {
+			actual := Filter(e.input, e.f)
+			if !reflect.DeepEqual(actual, e.expected) {
+				t.Errorf("Expect %v, got %v", e.expected, actual)
+				return
+			}
+		})
+	}
+}
+
+func TestMap(t *testing.T) {
+	examples := map[string]struct {
+		input    []int
+		f        func(n int) int
+		expected []int
+	}{
+		"double": {
+			input:    []int{1, 2, 3, 4, 5},
+			f:        func(n int) int { return n * 2 },
+			expected: []int{2, 4, 6, 8, 10},
+		},
+		"empty": {
+			input:    []int{},
+			f:        func(n int) int { return n * 2 },
+			expected: []int{},
+		},
+		"id": {
+			input:    []int{1, 2, 3, 4, 5},
+			f:        func(n int) int { return n },
+			expected: []int{1, 2, 3, 4, 5},
+		},
+	}
+
+	for name, e := range examples {
+		t.Run(name, func(t *testing.T) {
+			actual := Map(e.input, e.f)
+			if !reflect.DeepEqual(actual, e.expected) {
+				t.Errorf("Expect %v, got %v", e.expected, actual)
+				return
+			}
+		})
+	}
+}
