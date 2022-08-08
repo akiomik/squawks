@@ -14,40 +14,6 @@
 
 package export
 
-import (
-	"sort"
-
-	"github.com/akiomik/get-old-tweets/twitter/json"
-)
-
-func Contains(ss []string, needle string) bool {
-	for _, s := range ss {
-		if s == needle {
-			return true
-		}
-	}
-
-	return false
-}
-
-func KeysOf(m map[string]json.Tweet) []string {
-	keys := make([]string, len(m))
-
-	i := 0
-	for k := range m {
-		keys[i] = k
-		i++
-	}
-
-	return keys
-}
-
-func ReversedKeysOf(m map[string]json.Tweet) []string {
-	ks := KeysOf(m)
-	sort.Sort(sort.Reverse(sort.StringSlice(ks)))
-	return ks
-}
-
 func Filter[A any](xs []A, f func(A) bool) []A {
 	acc := []A{}
 
