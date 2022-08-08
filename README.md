@@ -2,6 +2,7 @@ get-old-tweets
 ==============
 
 [![Go](https://github.com/akiomik/get-old-tweets/actions/workflows/go.yml/badge.svg)](https://github.com/akiomik/get-old-tweets/actions/workflows/go.yml)
+[![CodeQL](https://github.com/akiomik/get-old-tweets/actions/workflows/codeql.yml/badge.svg)](https://github.com/akiomik/get-old-tweets/actions/workflows/codeql.yml)
 
 A cli tool to get old tweets on twitter (inspired by [Jefferson-Henrique/GetOldTweets-python](https://github.com/Jefferson-Henrique/GetOldTweets-python)).
 
