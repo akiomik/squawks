@@ -56,7 +56,7 @@ get-old-tweets --from 'barackobama' --since 2015-09-10 --until 2015-09-12 -o out
 Get the last 10 top tweets by username:
 
 ```sh
-get-old-tweets --from 'barackobama' --top
+get-old-tweets --from 'barackobama' --top -o out.csv
 ```
 
 ## Output CSV schema
