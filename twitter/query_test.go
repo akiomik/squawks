@@ -31,6 +31,7 @@ func TestEncode(t *testing.T) {
 		lang     string
 		filter   string
 		geocode  string
+		url      string
 		expected string
 	}{
 		"none": {
@@ -42,6 +43,7 @@ func TestEncode(t *testing.T) {
 			lang:     "",
 			filter:   "",
 			geocode:  "",
+			url:      "",
 			expected: "",
 		},
 		"all": {
@@ -53,7 +55,8 @@ func TestEncode(t *testing.T) {
 			lang:     "ja",
 			filter:   "verified",
 			geocode:  "35.6851508,139.7526768,0.1km",
-			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja filter:verified geocode:35.6851508,139.7526768,0.1km",
+			url:      "www.example.com",
+			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja filter:verified geocode:35.6851508,139.7526768,0.1km url:www.example.com",
 		},
 	}
 
@@ -68,6 +71,7 @@ func TestEncode(t *testing.T) {
 				Lang:    e.lang,
 				Filter:  e.filter,
 				Geocode: e.geocode,
+				Url:     e.url,
 			}
 
 			actual := q.Encode()
@@ -90,6 +94,7 @@ func TestIsEmpty(t *testing.T) {
 		lang     string
 		filter   string
 		geocode  string
+		url      string
 		expected bool
 	}{
 		"none": {
@@ -101,6 +106,7 @@ func TestIsEmpty(t *testing.T) {
 			lang:     "",
 			filter:   "",
 			geocode:  "",
+			url:      "",
 			expected: true,
 		},
 		"all": {
@@ -112,6 +118,7 @@ func TestIsEmpty(t *testing.T) {
 			lang:     "ja",
 			filter:   "verified",
 			geocode:  "35.6851508,139.7526768,0.1km",
+			url:      "www.example.com",
 			expected: false,
 		},
 	}
@@ -127,6 +134,7 @@ func TestIsEmpty(t *testing.T) {
 				Lang:    e.lang,
 				Filter:  e.filter,
 				Geocode: e.geocode,
+				Url:     e.url,
 			}
 
 			actual := q.IsEmpty()

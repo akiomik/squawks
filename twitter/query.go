@@ -27,6 +27,7 @@ type Query struct {
 	Lang    string
 	Filter  string
 	Geocode string
+	Url     string
 }
 
 func (q *Query) Encode() string {
@@ -62,6 +63,10 @@ func (q *Query) Encode() string {
 
 	if len(q.Geocode) != 0 {
 		ss = append(ss, "geocode:"+q.Geocode)
+	}
+
+	if len(q.Url) != 0 {
+		ss = append(ss, "url:"+q.Url)
 	}
 
 	return strings.Join(ss[:], " ")

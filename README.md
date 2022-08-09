@@ -28,6 +28,7 @@ Flags:
       --to string           find tweets sent in reply to a certain user
       --top                 find top tweets
       --until string        find tweets until a certain day (e.g. 2020-09-06)
+      --url string          find tweets containing a certain url (e.g. www.example.com)
       --user-agent string   set custom user-agent
   -v, --version             version for get-old-tweets
 ```

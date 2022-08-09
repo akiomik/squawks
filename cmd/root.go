@@ -34,6 +34,7 @@ var (
 	lang      string
 	filter    string
 	geocode   string
+	url       string
 	top       bool
 	userAgent string
 )
@@ -52,6 +53,7 @@ var rootCmd = &cobra.Command{
 			Lang:    lang,
 			Filter:  filter,
 			Geocode: geocode,
+			Url:     url,
 		}
 		if q.IsEmpty() {
 			fmt.Fprintln(os.Stderr, "Error: One or more queries are required")
@@ -100,6 +102,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&to, "to", "", "", "find tweets sent in reply to a certain user")
 	rootCmd.Flags().BoolVarP(&top, "top", "", false, "find top tweets")
 	rootCmd.Flags().StringVarP(&until, "until", "", "", "find tweets until a certain day (e.g. 2020-09-06)")
+	rootCmd.Flags().StringVarP(&url, "url", "", "", "find tweets containing a certain url (e.g. www.example.com)")
 	rootCmd.Flags().StringVarP(&userAgent, "user-agent", "", "", "set custom user-agent")
 	rootCmd.MarkFlagRequired("out")
 }
