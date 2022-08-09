@@ -36,6 +36,16 @@ func ExportCsv(f *os.File, ch <-chan []Record) <-chan struct{} {
 
 		for records := range ch {
 			for _, record := range records {
+				geo := ""
+				if record.Geo != nil {
+					geo = record.Geo.String()
+				}
+
+				coordinates := ""
+				if record.Coordinates != nil {
+					coordinates = record.Coordinates.String()
+				}
+
 				row := []string{
 					strconv.FormatUint(record.Id, 10),
 					record.Username,
@@ -45,8 +55,8 @@ func ExportCsv(f *os.File, ch <-chan []Record) <-chan struct{} {
 					strconv.FormatUint(record.FavoriteCount, 10),
 					strconv.FormatUint(record.ReplyCount, 10),
 					strconv.FormatUint(record.QuoteCount, 10),
-					record.Geo,
-					record.Coodinates,
+					geo,
+					coordinates,
 					record.Lang,
 					record.Source,
 				}

@@ -45,6 +45,31 @@ var (
 	}
 )
 
+func TestCoordinateString(t *testing.T) {
+	examples := map[string]struct {
+		coordinate Coordinate
+		expected   string
+	}{
+		"normal": {
+			coordinate: Coordinate{40.74118764, -73.9998279},
+			expected:   "40.74118764,-73.9998279",
+		},
+		"zero": {
+			coordinate: Coordinate{},
+			expected:   "0,0",
+		},
+	}
+
+	for name, e := range examples {
+		t.Run(name, func(t *testing.T) {
+			actual := e.coordinate.String()
+			if actual != e.expected {
+				t.Errorf(`Expect "%s", got "%s"`, e.expected, actual)
+			}
+		})
+	}
+}
+
 func TestFindCursorWhenReplaceEntryExists(t *testing.T) {
 	j := Adaptive{
 		Timeline: Timeline{

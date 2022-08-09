@@ -14,9 +14,37 @@
 
 package json
 
+import (
+	"strconv"
+)
+
+type Coordinate [2]float64
+
+func (coord Coordinate) X() float64 {
+	return coord[0]
+}
+
+func (coord Coordinate) Y() float64 {
+	return coord[1]
+}
+
+func (coord Coordinate) String() string {
+	return strconv.FormatFloat(coord.X(), 'f', -1, 64) + "," + strconv.FormatFloat(coord.Y(), 'f', -1, 64)
+}
+
+type Geo struct {
+	Type        string     `json:"type"`
+	Coordinates Coordinate `json:"coordinates"`
+}
+
+type Coordinates struct {
+	Type        string     `json:"type"`
+	Coordinates Coordinate `json:"coordinates"`
+}
+
 type BoundingBox struct {
-	Type       string        `json:"type"`
-	Coodinates [][][]float64 `json:"coordinates"`
+	Type        string         `json:"type"`
+	Coordinates [][]Coordinate `json:"coordinates"`
 }
 
 type Place struct {
@@ -31,17 +59,17 @@ type Place struct {
 }
 
 type Tweet struct {
-	Id            uint64   `json:"id"`
-	UserId        uint64   `json:"user_id"`
-	FullText      string   `json:"full_text"`
-	RetweetCount  uint64   `json:"retweet_count"`
-	FavoriteCount uint64   `json:"favorite_count"`
-	ReplyCount    uint64   `json:"reply_count"`
-	QuoteCount    uint64   `json:"quote_count"`
-	Geo           string   `json:"geo"`
-	Coodinates    string   `json:"coordinates"`
-	Place         Place    `json:"place"`
-	Lang          string   `json:"lang"`
-	Source        string   `json:"source"`
-	CreatedAt     RubyDate `json:"created_at"`
+	Id            uint64       `json:"id"`
+	UserId        uint64       `json:"user_id"`
+	FullText      string       `json:"full_text"`
+	RetweetCount  uint64       `json:"retweet_count"`
+	FavoriteCount uint64       `json:"favorite_count"`
+	ReplyCount    uint64       `json:"reply_count"`
+	QuoteCount    uint64       `json:"quote_count"`
+	Geo           *Geo         `json:"geo"`
+	Coordinates   *Coordinates `json:"coordinates"`
+	Place         Place        `json:"place"`
+	Lang          string       `json:"lang"`
+	Source        string       `json:"source"`
+	CreatedAt     RubyDate     `json:"created_at"`
 }
