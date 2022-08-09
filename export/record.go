@@ -32,8 +32,7 @@ type Record struct {
 	FavoriteCount uint64
 	ReplyCount    uint64
 	QuoteCount    uint64
-	Geo           *json.Coordinate
-	Coordinates   *json.Coordinate
+	Geo           *json.LatLong
 	Lang          string
 	Source        string
 }
@@ -64,7 +63,7 @@ func NewRecordsFromAdaptive(j *json.Adaptive) []Record {
 		t := j.GlobalObjects.Tweets[id]
 		u := j.GlobalObjects.Users[strconv.FormatUint(t.UserId, 10)]
 
-		var geo *json.Coordinate
+		var geo *json.LatLong
 		if t.Geo != nil {
 			geo = &t.Geo.Coordinates
 		}

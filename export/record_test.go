@@ -229,7 +229,7 @@ func TestNewRecordsFromAdaptive(t *testing.T) {
 			FavoriteCount: 400,
 			ReplyCount:    500,
 			QuoteCount:    600,
-			Geo:           &json.Coordinate{40.74118764, -73.9998279},
+			Geo:           &json.LatLong{40.74118764, -73.9998279},
 			Lang:          "en",
 		},
 	}
