@@ -69,11 +69,6 @@ func NewRecordsFromAdaptive(j *json.Adaptive) []Record {
 			geo = &t.Geo.Coordinates
 		}
 
-		var coordinates *json.Coordinate
-		if t.Coordinates != nil {
-			coordinates = &t.Coordinates.Coordinates
-		}
-
 		return Record{
 			Id:            t.Id,
 			Username:      u.ScreenName,
@@ -84,7 +79,6 @@ func NewRecordsFromAdaptive(j *json.Adaptive) []Record {
 			ReplyCount:    t.ReplyCount,
 			QuoteCount:    t.QuoteCount,
 			Geo:           geo,
-			Coordinates:   coordinates,
 			Lang:          t.Lang,
 			Source:        t.Source,
 		}

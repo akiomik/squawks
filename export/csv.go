@@ -28,7 +28,7 @@ func ExportCsv(f *os.File, ch <-chan []Record) <-chan struct{} {
 		defer close(done)
 
 		w := csv.NewWriter(f)
-		err := w.Write([]string{"id", "username", "created_at", "full_text", "retweet_count", "favorite_count", "reply_count", "quote_count", "geo", "coordinates", "lang", "source"})
+		err := w.Write([]string{"id", "username", "created_at", "full_text", "retweet_count", "favorite_count", "reply_count", "quote_count", "geo", "lang", "source"})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			panic(err)
@@ -41,11 +41,6 @@ func ExportCsv(f *os.File, ch <-chan []Record) <-chan struct{} {
 					geo = record.Geo.String()
 				}
 
-				coordinates := ""
-				if record.Coordinates != nil {
-					coordinates = record.Coordinates.String()
-				}
-
 				row := []string{
 					strconv.FormatUint(record.Id, 10),
 					record.Username,
@@ -56,7 +51,6 @@ func ExportCsv(f *os.File, ch <-chan []Record) <-chan struct{} {
 					strconv.FormatUint(record.ReplyCount, 10),
 					strconv.FormatUint(record.QuoteCount, 10),
 					geo,
-					coordinates,
 					record.Lang,
 					record.Source,
 				}

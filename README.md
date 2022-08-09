@@ -68,7 +68,6 @@ get-old-tweets --from 'barackobama' --top
 - `reply_count` (int)
 - `quote_count` (int)
 - `geo` (str)
-- `coordinates` (str)
 - `lang` (str)
 - `source` (str)
 
