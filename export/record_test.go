@@ -207,6 +207,8 @@ func TestNewRecordsFromAdaptive(t *testing.T) {
 		},
 	}
 
+	latitude := 40.74118764
+	longitude := -73.9998279
 	expected := []Record{
 		Record{
 			Id:            1000,
@@ -217,7 +219,8 @@ func TestNewRecordsFromAdaptive(t *testing.T) {
 			FavoriteCount: 4000,
 			ReplyCount:    5000,
 			QuoteCount:    6000,
-			Coordinates:   nil,
+			Latitude:      nil,
+			Longitude:     nil,
 			Lang:          "en",
 		},
 		Record{
@@ -229,7 +232,8 @@ func TestNewRecordsFromAdaptive(t *testing.T) {
 			FavoriteCount: 400,
 			ReplyCount:    500,
 			QuoteCount:    600,
-			Coordinates:   &json.LongLat{-73.9998279, 40.74118764},
+			Latitude:      &latitude,
+			Longitude:     &longitude,
 			Lang:          "en",
 		},
 	}

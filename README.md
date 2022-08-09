@@ -69,7 +69,8 @@ get-old-tweets --from 'barackobama' --top -o out.csv
 - `favorite_count` (int)
 - `reply_count` (int)
 - `quote_count` (int)
-- `coordinates` (str)
+- `latitude` (float)
+- `longitude` (float)
 - `lang` (str)
 - `source` (str)
 
