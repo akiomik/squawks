@@ -14,6 +14,8 @@
 
 package json
 
+// https://developer.twitter.com/en/docs/twitter-api/v1/data-dictionary/object-model/tweet
+
 type Tweet struct {
 	Id            uint64       `json:"id"`
 	UserId        uint64       `json:"user_id"`
@@ -22,7 +24,7 @@ type Tweet struct {
 	FavoriteCount uint64       `json:"favorite_count"`
 	ReplyCount    uint64       `json:"reply_count"`
 	QuoteCount    uint64       `json:"quote_count"`
-	Geo           *Geo         `json:"geo"`
+	Geo           *Geo         `json:"geo"` // deprecated
 	Coordinates   *Coordinates `json:"coordinates"`
 	Place         *Place       `json:"place"`
 	Lang          string       `json:"lang"`

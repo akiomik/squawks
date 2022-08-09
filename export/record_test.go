@@ -147,9 +147,9 @@ func TestNewRecordsFromAdaptive(t *testing.T) {
 					FavoriteCount: 400,
 					ReplyCount:    500,
 					QuoteCount:    600,
-					Geo: &json.Geo{
+					Coordinates: &json.Coordinates{
 						Type:        "Point",
-						Coordinates: [2]float64{40.74118764, -73.9998279},
+						Coordinates: json.LongLat{-73.9998279, 40.74118764},
 					},
 					Lang: "en",
 				},
@@ -217,7 +217,7 @@ func TestNewRecordsFromAdaptive(t *testing.T) {
 			FavoriteCount: 4000,
 			ReplyCount:    5000,
 			QuoteCount:    6000,
-			Geo:           nil,
+			Coordinates:   nil,
 			Lang:          "en",
 		},
 		Record{
@@ -229,7 +229,7 @@ func TestNewRecordsFromAdaptive(t *testing.T) {
 			FavoriteCount: 400,
 			ReplyCount:    500,
 			QuoteCount:    600,
-			Geo:           &json.LatLong{40.74118764, -73.9998279},
+			Coordinates:   &json.LongLat{-73.9998279, 40.74118764},
 			Lang:          "en",
 		},
 	}

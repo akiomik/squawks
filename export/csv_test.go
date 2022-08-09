@@ -84,7 +84,7 @@ func TestExportCsvNonEmpty(t *testing.T) {
 				FavoriteCount: 400,
 				ReplyCount:    500,
 				QuoteCount:    600,
-				Geo:           &json.LatLong{40.74118764, -73.9998279},
+				Coordinates:   &json.LongLat{-73.9998279, 40.74118764},
 				Lang:          "en",
 			},
 		}
@@ -126,7 +126,7 @@ func TestExportCsvNonEmpty(t *testing.T) {
 		return
 	}
 
-	expectedHeader := []string{"id", "username", "created_at", "full_text", "retweet_count", "favorite_count", "reply_count", "quote_count", "geo", "lang", "source"}
+	expectedHeader := []string{"id", "username", "created_at", "full_text", "retweet_count", "favorite_count", "reply_count", "quote_count", "coordinates", "lang", "source"}
 	if !reflect.DeepEqual(actualHeader, expectedHeader) {
 		t.Errorf("Expect to write %v as a header, got %v", expectedHeader, actualHeader)
 		return
@@ -134,7 +134,7 @@ func TestExportCsvNonEmpty(t *testing.T) {
 
 	expectedRecords := [][]string{
 		[]string{"1000", "watson1", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "3000", "4000", "5000", "6000", "", "en", ""},
-		[]string{"100", "watson2", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "300", "400", "500", "600", "40.74118764,-73.9998279", "en", ""},
+		[]string{"100", "watson2", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "300", "400", "500", "600", "-73.9998279,40.74118764", "en", ""},
 		[]string{"10", "watson3", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "30", "40", "50", "60", "", "en", ""},
 		[]string{"1", "watson4", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "3", "4", "5", "6", "", "en", ""},
 	}
