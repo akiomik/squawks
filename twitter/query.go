@@ -19,13 +19,14 @@ import (
 )
 
 type Query struct {
-	Text   string
-	Since  string
-	Until  string
-	From   string
-	To     string
-	Lang   string
-	Filter string
+	Text    string
+	Since   string
+	Until   string
+	From    string
+	To      string
+	Lang    string
+	Filter  string
+	Geocode string
 }
 
 func (q *Query) Encode() string {
@@ -57,6 +58,10 @@ func (q *Query) Encode() string {
 
 	if len(q.Filter) != 0 {
 		ss = append(ss, "filter:"+q.Filter)
+	}
+
+	if len(q.Geocode) != 0 {
+		ss = append(ss, "geocode:"+q.Geocode)
 	}
 
 	return strings.Join(ss[:], " ")

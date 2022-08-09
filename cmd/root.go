@@ -33,6 +33,7 @@ var (
 	to        string
 	lang      string
 	filter    string
+	geocode   string
 	top       bool
 	userAgent string
 )
@@ -43,13 +44,14 @@ var rootCmd = &cobra.Command{
 	Version: config.Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		q := twitter.Query{
-			Text:   text,
-			Since:  since,
-			Until:  until,
-			From:   from,
-			To:     to,
-			Lang:   lang,
-			Filter: filter,
+			Text:    text,
+			Since:   since,
+			Until:   until,
+			From:    from,
+			To:      to,
+			Lang:    lang,
+			Filter:  filter,
+			Geocode: geocode,
 		}
 		if q.IsEmpty() {
 			fmt.Fprintln(os.Stderr, "Error: One or more queries are required")
@@ -90,6 +92,7 @@ var rootCmd = &cobra.Command{
 func init() {
 	rootCmd.Flags().StringVarP(&filter, "filter", "", "", "find tweets by type of account (e.g. verified)")
 	rootCmd.Flags().StringVarP(&from, "from", "", "", "find tweets sent from a certain user")
+	rootCmd.Flags().StringVarP(&geocode, "geocode", "", "", "find tweets sent from certain coordinates (e.g. 35.6851508,139.7526768,0.1km)")
 	rootCmd.Flags().StringVarP(&lang, "lang", "", "", "find tweets by a certain language (e.g. en, es, fr)")
 	rootCmd.Flags().StringVarP(&out, "out", "o", "", "output csv filename (required)")
 	rootCmd.Flags().StringVarP(&text, "query", "q", "", "query text to search")

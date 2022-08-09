@@ -19,6 +19,7 @@ Usage:
 Flags:
       --filter string       find tweets by type of account (e.g. verified)
       --from string         find tweets sent from a certain user
+      --geocode string      find tweets sent from certain coordinates (e.g. 35.6851508,139.7526768,0.1km)
   -h, --help                help for get-old-tweets
       --lang string         find tweets by a certain language (e.g. en, es, fr)
   -o, --out string          output csv filename (required)

@@ -30,6 +30,7 @@ func TestEncode(t *testing.T) {
 		to       string
 		lang     string
 		filter   string
+		geocode  string
 		expected string
 	}{
 		"none": {
@@ -40,6 +41,7 @@ func TestEncode(t *testing.T) {
 			to:       "",
 			lang:     "",
 			filter:   "",
+			geocode:  "",
 			expected: "",
 		},
 		"all": {
@@ -50,20 +52,22 @@ func TestEncode(t *testing.T) {
 			to:       "bar",
 			lang:     "ja",
 			filter:   "verified",
-			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja filter:verified",
+			geocode:  "35.6851508,139.7526768,0.1km",
+			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja filter:verified geocode:35.6851508,139.7526768,0.1km",
 		},
 	}
 
 	for name, e := range examples {
 		t.Run(name, func(t *testing.T) {
 			q := Query{
-				Text:   e.text,
-				Since:  e.since,
-				Until:  e.until,
-				From:   e.from,
-				To:     e.to,
-				Lang:   e.lang,
-				Filter: e.filter,
+				Text:    e.text,
+				Since:   e.since,
+				Until:   e.until,
+				From:    e.from,
+				To:      e.to,
+				Lang:    e.lang,
+				Filter:  e.filter,
+				Geocode: e.geocode,
 			}
 
 			actual := q.Encode()
@@ -85,6 +89,7 @@ func TestIsEmpty(t *testing.T) {
 		to       string
 		lang     string
 		filter   string
+		geocode  string
 		expected bool
 	}{
 		"none": {
@@ -95,6 +100,7 @@ func TestIsEmpty(t *testing.T) {
 			to:       "",
 			lang:     "",
 			filter:   "",
+			geocode:  "",
 			expected: true,
 		},
 		"all": {
@@ -105,6 +111,7 @@ func TestIsEmpty(t *testing.T) {
 			to:       "bar",
 			lang:     "ja",
 			filter:   "verified",
+			geocode:  "35.6851508,139.7526768,0.1km",
 			expected: false,
 		},
 	}
@@ -112,13 +119,14 @@ func TestIsEmpty(t *testing.T) {
 	for name, e := range examples {
 		t.Run(name, func(t *testing.T) {
 			q := Query{
-				Text:   e.text,
-				Since:  e.since,
-				Until:  e.until,
-				From:   e.from,
-				To:     e.to,
-				Lang:   e.lang,
-				Filter: e.filter,
+				Text:    e.text,
+				Since:   e.since,
+				Until:   e.until,
+				From:    e.from,
+				To:      e.to,
+				Lang:    e.lang,
+				Filter:  e.filter,
+				Geocode: e.geocode,
 			}
 
 			actual := q.IsEmpty()
