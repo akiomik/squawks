@@ -32,7 +32,7 @@ var (
 	from      string
 	to        string
 	lang      string
-	filter    string
+	filters   []string
 	geocode   string
 	url       string
 	top       bool
@@ -51,7 +51,7 @@ var rootCmd = &cobra.Command{
 			From:    from,
 			To:      to,
 			Lang:    lang,
-			Filter:  filter,
+			Filters: filters,
 			Geocode: geocode,
 			Url:     url,
 		}
@@ -92,7 +92,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.Flags().StringVarP(&filter, "filter", "", "", "find tweets by type of account (e.g. verified)")
+	rootCmd.Flags().StringSliceVarP(&filters, "filter", "", []string{}, "find tweets by type of account or tweet (e.g. verified, follows, images, links)")
 	rootCmd.Flags().StringVarP(&from, "from", "", "", "find tweets sent from a certain user")
 	rootCmd.Flags().StringVarP(&geocode, "geocode", "", "", "find tweets sent from certain coordinates (e.g. 35.6851508,139.7526768,0.1km)")
 	rootCmd.Flags().StringVarP(&lang, "lang", "", "", "find tweets by a certain language (e.g. en, es, fr)")

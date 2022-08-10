@@ -29,7 +29,7 @@ func TestEncode(t *testing.T) {
 		from     string
 		to       string
 		lang     string
-		filter   string
+		filters  []string
 		geocode  string
 		url      string
 		expected string
@@ -41,7 +41,7 @@ func TestEncode(t *testing.T) {
 			from:     "",
 			to:       "",
 			lang:     "",
-			filter:   "",
+			filters:  []string{},
 			geocode:  "",
 			url:      "",
 			expected: "",
@@ -53,10 +53,10 @@ func TestEncode(t *testing.T) {
 			from:     "foo",
 			to:       "bar",
 			lang:     "ja",
-			filter:   "verified",
+			filters:  []string{"verified", "links"},
 			geocode:  "35.6851508,139.7526768,0.1km",
 			url:      "www.example.com",
-			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja filter:verified geocode:35.6851508,139.7526768,0.1km url:www.example.com",
+			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja filter:verified filter:links geocode:35.6851508,139.7526768,0.1km url:www.example.com",
 		},
 	}
 
@@ -69,7 +69,7 @@ func TestEncode(t *testing.T) {
 				From:    e.from,
 				To:      e.to,
 				Lang:    e.lang,
-				Filter:  e.filter,
+				Filters: e.filters,
 				Geocode: e.geocode,
 				Url:     e.url,
 			}
@@ -92,7 +92,7 @@ func TestIsEmpty(t *testing.T) {
 		from     string
 		to       string
 		lang     string
-		filter   string
+		filters  []string
 		geocode  string
 		url      string
 		expected bool
@@ -104,7 +104,7 @@ func TestIsEmpty(t *testing.T) {
 			from:     "",
 			to:       "",
 			lang:     "",
-			filter:   "",
+			filters:  []string{},
 			geocode:  "",
 			url:      "",
 			expected: true,
@@ -116,7 +116,7 @@ func TestIsEmpty(t *testing.T) {
 			from:     "foo",
 			to:       "bar",
 			lang:     "ja",
-			filter:   "verified",
+			filters:  []string{"verified", "links"},
 			geocode:  "35.6851508,139.7526768,0.1km",
 			url:      "www.example.com",
 			expected: false,
@@ -132,7 +132,7 @@ func TestIsEmpty(t *testing.T) {
 				From:    e.from,
 				To:      e.to,
 				Lang:    e.lang,
-				Filter:  e.filter,
+				Filters: e.filters,
 				Geocode: e.geocode,
 				Url:     e.url,
 			}
