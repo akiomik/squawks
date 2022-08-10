@@ -30,6 +30,7 @@ func TestEncode(t *testing.T) {
 		to       string
 		lang     string
 		filters  []string
+		excludes []string
 		geocode  string
 		url      string
 		expected string
@@ -42,6 +43,7 @@ func TestEncode(t *testing.T) {
 			to:       "",
 			lang:     "",
 			filters:  []string{},
+			excludes: []string{},
 			geocode:  "",
 			url:      "",
 			expected: "",
@@ -54,24 +56,26 @@ func TestEncode(t *testing.T) {
 			to:       "bar",
 			lang:     "ja",
 			filters:  []string{"verified", "links"},
+			excludes: []string{"replies", "hashtags"},
 			geocode:  "35.6851508,139.7526768,0.1km",
 			url:      "www.example.com",
-			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja filter:verified filter:links geocode:35.6851508,139.7526768,0.1km url:www.example.com",
+			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja filter:verified filter:links exclude:replies exclude:hashtags geocode:35.6851508,139.7526768,0.1km url:www.example.com",
 		},
 	}
 
 	for name, e := range examples {
 		t.Run(name, func(t *testing.T) {
 			q := Query{
-				Text:    e.text,
-				Since:   e.since,
-				Until:   e.until,
-				From:    e.from,
-				To:      e.to,
-				Lang:    e.lang,
-				Filters: e.filters,
-				Geocode: e.geocode,
-				Url:     e.url,
+				Text:     e.text,
+				Since:    e.since,
+				Until:    e.until,
+				From:     e.from,
+				To:       e.to,
+				Lang:     e.lang,
+				Filters:  e.filters,
+				Excludes: e.excludes,
+				Geocode:  e.geocode,
+				Url:      e.url,
 			}
 
 			actual := q.Encode()
@@ -93,6 +97,7 @@ func TestIsEmpty(t *testing.T) {
 		to       string
 		lang     string
 		filters  []string
+		excludes []string
 		geocode  string
 		url      string
 		expected bool
@@ -105,6 +110,7 @@ func TestIsEmpty(t *testing.T) {
 			to:       "",
 			lang:     "",
 			filters:  []string{},
+			excludes: []string{},
 			geocode:  "",
 			url:      "",
 			expected: true,
@@ -117,6 +123,7 @@ func TestIsEmpty(t *testing.T) {
 			to:       "bar",
 			lang:     "ja",
 			filters:  []string{"verified", "links"},
+			excludes: []string{"replies", "hashtags"},
 			geocode:  "35.6851508,139.7526768,0.1km",
 			url:      "www.example.com",
 			expected: false,
@@ -126,15 +133,16 @@ func TestIsEmpty(t *testing.T) {
 	for name, e := range examples {
 		t.Run(name, func(t *testing.T) {
 			q := Query{
-				Text:    e.text,
-				Since:   e.since,
-				Until:   e.until,
-				From:    e.from,
-				To:      e.to,
-				Lang:    e.lang,
-				Filters: e.filters,
-				Geocode: e.geocode,
-				Url:     e.url,
+				Text:     e.text,
+				Since:    e.since,
+				Until:    e.until,
+				From:     e.from,
+				To:       e.to,
+				Lang:     e.lang,
+				Filters:  e.filters,
+				Excludes: e.excludes,
+				Geocode:  e.geocode,
+				Url:      e.url,
 			}
 
 			actual := q.IsEmpty()

@@ -19,15 +19,16 @@ import (
 )
 
 type Query struct {
-	Text    string
-	Since   string
-	Until   string
-	From    string
-	To      string
-	Lang    string
-	Filters []string
-	Geocode string
-	Url     string
+	Text     string
+	Since    string
+	Until    string
+	From     string
+	To       string
+	Lang     string
+	Filters  []string
+	Excludes []string
+	Geocode  string
+	Url      string
 }
 
 func (q *Query) Encode() string {
@@ -59,6 +60,10 @@ func (q *Query) Encode() string {
 
 	for _, filter := range q.Filters {
 		ss = append(ss, "filter:"+filter)
+	}
+
+	for _, exclude := range q.Excludes {
+		ss = append(ss, "exclude:"+exclude)
 	}
 
 	if len(q.Geocode) != 0 {

@@ -18,7 +18,8 @@ Usage:
   get-old-tweets --out FILENAME [flags]
 
 Flags:
-      --filter string       find tweets by type of account (e.g. verified)
+      --exclude strings     exclude tweets by type of tweet (e.g. hashtags, retweets, replies)
+      --filter strings      find tweets by type of account or tweet (e.g. verified, follows, images, links)
       --from string         find tweets sent from a certain user
       --geocode string      find tweets sent from certain coordinates (e.g. 35.6851508,139.7526768,0.1km)
   -h, --help                help for get-old-tweets
