@@ -33,6 +33,7 @@ var (
 	to        string
 	lang      string
 	filters   []string
+	includes  []string
 	excludes  []string
 	geocode   string
 	url       string
@@ -53,6 +54,7 @@ var rootCmd = &cobra.Command{
 			To:       to,
 			Lang:     lang,
 			Filters:  filters,
+			Includes: includes,
 			Excludes: excludes,
 			Geocode:  geocode,
 			Url:      url,
@@ -98,6 +100,7 @@ func init() {
 	rootCmd.Flags().StringSliceVarP(&filters, "filter", "", []string{}, "find tweets by type of account or tweet (e.g. verified, follows, images, links)")
 	rootCmd.Flags().StringVarP(&from, "from", "", "", "find tweets sent from a certain user")
 	rootCmd.Flags().StringVarP(&geocode, "geocode", "", "", "find tweets sent from certain coordinates (e.g. 35.6851508,139.7526768,0.1km)")
+	rootCmd.Flags().StringSliceVarP(&includes, "include", "", []string{}, "include tweets by type of tweet (e.g. hashtags, retweets, replies)")
 	rootCmd.Flags().StringVarP(&lang, "lang", "", "", "find tweets by a certain language (e.g. en, es, fr)")
 	rootCmd.Flags().StringVarP(&out, "out", "o", "", "output csv filename (required)")
 	rootCmd.Flags().StringVarP(&text, "query", "q", "", "query text to search")

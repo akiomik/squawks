@@ -30,6 +30,7 @@ func TestEncode(t *testing.T) {
 		to       string
 		lang     string
 		filters  []string
+		includes []string
 		excludes []string
 		geocode  string
 		url      string
@@ -43,6 +44,7 @@ func TestEncode(t *testing.T) {
 			to:       "",
 			lang:     "",
 			filters:  []string{},
+			includes: []string{},
 			excludes: []string{},
 			geocode:  "",
 			url:      "",
@@ -56,10 +58,11 @@ func TestEncode(t *testing.T) {
 			to:       "bar",
 			lang:     "ja",
 			filters:  []string{"verified", "links"},
+			includes: []string{"retweets", "nativeretweets"},
 			excludes: []string{"replies", "hashtags"},
 			geocode:  "35.6851508,139.7526768,0.1km",
 			url:      "www.example.com",
-			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja filter:verified filter:links exclude:replies exclude:hashtags geocode:35.6851508,139.7526768,0.1km url:www.example.com",
+			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja filter:verified filter:links include:retweets include:nativeretweets exclude:replies exclude:hashtags geocode:35.6851508,139.7526768,0.1km url:www.example.com",
 		},
 	}
 
@@ -73,6 +76,7 @@ func TestEncode(t *testing.T) {
 				To:       e.to,
 				Lang:     e.lang,
 				Filters:  e.filters,
+				Includes: e.includes,
 				Excludes: e.excludes,
 				Geocode:  e.geocode,
 				Url:      e.url,
@@ -97,6 +101,7 @@ func TestIsEmpty(t *testing.T) {
 		to       string
 		lang     string
 		filters  []string
+		includes []string
 		excludes []string
 		geocode  string
 		url      string
@@ -110,6 +115,7 @@ func TestIsEmpty(t *testing.T) {
 			to:       "",
 			lang:     "",
 			filters:  []string{},
+			includes: []string{},
 			excludes: []string{},
 			geocode:  "",
 			url:      "",
@@ -123,6 +129,7 @@ func TestIsEmpty(t *testing.T) {
 			to:       "bar",
 			lang:     "ja",
 			filters:  []string{"verified", "links"},
+			includes: []string{"retweets", "nativeretweets"},
 			excludes: []string{"replies", "hashtags"},
 			geocode:  "35.6851508,139.7526768,0.1km",
 			url:      "www.example.com",
@@ -140,6 +147,7 @@ func TestIsEmpty(t *testing.T) {
 				To:       e.to,
 				Lang:     e.lang,
 				Filters:  e.filters,
+				Includes: e.includes,
 				Excludes: e.excludes,
 				Geocode:  e.geocode,
 				Url:      e.url,

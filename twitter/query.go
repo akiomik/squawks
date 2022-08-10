@@ -26,6 +26,7 @@ type Query struct {
 	To       string
 	Lang     string
 	Filters  []string
+	Includes []string
 	Excludes []string
 	Geocode  string
 	Url      string
@@ -60,6 +61,10 @@ func (q *Query) Encode() string {
 
 	for _, filter := range q.Filters {
 		ss = append(ss, "filter:"+filter)
+	}
+
+	for _, include := range q.Includes {
+		ss = append(ss, "include:"+include)
 	}
 
 	for _, exclude := range q.Excludes {
