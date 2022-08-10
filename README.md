@@ -53,7 +53,7 @@ Get tweets by username and bound dates:
 get-old-tweets --from 'barackobama' --since 2015-09-10 --until 2015-09-12 -o out.csv
 ```
 
-Get the last 10 top tweets by username:
+Get top tweets by username:
 
 ```sh
 get-old-tweets --from 'barackobama' --top -o out.csv
