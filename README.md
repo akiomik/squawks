@@ -8,7 +8,8 @@ A cli tool to get old tweets on twitter (inspired by [Jefferson-Henrique/GetOldT
 
 ## Install
 
-The binaries for Linux, macOS and Windows can be downloaded from [the release page](https://github.com/akiomik/get-old-tweets/releases/latest).
+- Download the latest release from [the release page](https://github.com/akiomik/get-old-tweets/releases/latest). Supported platforms are Windows, macOS and linux.
+- Extract the downloaded `.tar.gz` file.
 
 ## Usage
 
