@@ -96,11 +96,11 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.Flags().StringSliceVarP(&excludes, "exclude", "", []string{}, "exclude tweets by type of tweet (e.g. hashtags, retweets, replies)")
-	rootCmd.Flags().StringSliceVarP(&filters, "filter", "", []string{}, "find tweets by type of account or tweet (e.g. verified, follows, images, links)")
+	StringSliceEnumVarP(rootCmd.Flags(), &excludes, "exclude", "", []string{}, "exclude tweets by type of tweet", []string{"hashtags", "nativeretweets", "retweets", "replies"})
+	StringSliceEnumVarP(rootCmd.Flags(), &filters, "filter", "", []string{}, "find tweets by type of account or tweet", []string{"verified", "follows", "media", "images", "twimg", "videos", "periscope", "vine", "consumer_video", "pro_video", "native_video", "links", "hashtags", "nativeretweets", "retweets", "replies", "safe", "news"})
 	rootCmd.Flags().StringVarP(&from, "from", "", "", "find tweets sent from a certain user")
 	rootCmd.Flags().StringVarP(&geocode, "geocode", "", "", "find tweets sent from certain coordinates (e.g. 35.6851508,139.7526768,0.1km)")
-	rootCmd.Flags().StringSliceVarP(&includes, "include", "", []string{}, "include tweets by type of tweet (e.g. hashtags, retweets, replies)")
+	StringSliceEnumVarP(rootCmd.Flags(), &includes, "include", "", []string{}, "include tweets by type of tweet", []string{"hashtags", "nativeretweets", "retweets", "replies"})
 	rootCmd.Flags().StringVarP(&lang, "lang", "", "", "find tweets by a certain language (e.g. en, es, fr)")
 	rootCmd.Flags().StringVarP(&out, "out", "o", "", "output csv filename (required)")
 	rootCmd.Flags().StringVarP(&text, "query", "q", "", "query text to search")
