@@ -14,4 +14,4 @@
 
 package config
 
-const Version = "0.2.1-SNAPSHOT"
+const Version = "0.2.1"
