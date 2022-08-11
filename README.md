@@ -18,12 +18,12 @@ Usage:
   get-old-tweets --out FILENAME [flags]
 
 Flags:
-      --exclude strings     exclude tweets by type of tweet (e.g. hashtags, retweets, replies)
-      --filter strings      find tweets by type of account or tweet (e.g. verified, follows, images, links)
+      --exclude strings     exclude tweets by type of tweet [hashtags|nativeretweets|retweets|replies] (default [])
+      --filter strings      find tweets by type of account or tweet [verified|follows|media|images|twimg|videos|periscope|vine|consumer_video|pro_video|native_video|links|hashtags|nativeretweets|retweets|replies|safe|news] (default [])
       --from string         find tweets sent from a certain user
       --geocode string      find tweets sent from certain coordinates (e.g. 35.6851508,139.7526768,0.1km)
   -h, --help                help for get-old-tweets
-      --include strings     include tweets by type of tweet (e.g. hashtags, retweets, replies)
+      --include strings     include tweets by type of tweet [hashtags|nativeretweets|retweets|replies] (default [])
       --lang string         find tweets by a certain language (e.g. en, es, fr)
   -o, --out string          output csv filename (required)
   -q, --query string        query text to search
