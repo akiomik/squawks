@@ -29,6 +29,8 @@ type Query struct {
 	Includes []string
 	Excludes []string
 	Geocode  string
+	Near     string
+	Within   string
 	Url      string
 }
 
@@ -73,6 +75,14 @@ func (q *Query) Encode() string {
 
 	if len(q.Geocode) != 0 {
 		ss = append(ss, "geocode:"+q.Geocode)
+	}
+
+	if len(q.Near) != 0 {
+		ss = append(ss, "near:"+q.Near)
+	}
+
+	if len(q.Within) != 0 {
+		ss = append(ss, "within:"+q.Within)
 	}
 
 	if len(q.Url) != 0 {

@@ -25,6 +25,7 @@ Flags:
   -h, --help                help for get-old-tweets
       --include strings     include tweets by type of tweet [hashtags|nativeretweets|retweets|replies] (default [])
       --lang string         find tweets by a certain language (e.g. en, es, fr)
+      --near string         find tweets nearby a certain location (e.g. tokyo)
   -o, --out string          output csv filename (required)
   -q, --query string        query text to search
       --since string        find tweets since a certain day (e.g. 2014-07-21)
@@ -34,6 +35,7 @@ Flags:
       --url string          find tweets containing a certain url (e.g. www.example.com)
       --user-agent string   set custom user-agent
   -v, --version             version for get-old-tweets
+      --within string       find tweets nearby a certain location (e.g. 1km)
 ```
 
 ## Example

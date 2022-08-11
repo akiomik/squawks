@@ -37,6 +37,8 @@ var (
 	excludes  []string
 	geocode   string
 	url       string
+	near      string
+	within    string
 	top       bool
 	userAgent string
 )
@@ -57,6 +59,8 @@ var rootCmd = &cobra.Command{
 			Includes: includes,
 			Excludes: excludes,
 			Geocode:  geocode,
+			Near:     near,
+			Within:   within,
 			Url:      url,
 		}
 		if q.IsEmpty() {
@@ -102,6 +106,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&geocode, "geocode", "", "", "find tweets sent from certain coordinates (e.g. 35.6851508,139.7526768,0.1km)")
 	StringSliceEnumVarP(rootCmd.Flags(), &includes, "include", "", []string{}, "include tweets by type of tweet", []string{"hashtags", "nativeretweets", "retweets", "replies"})
 	rootCmd.Flags().StringVarP(&lang, "lang", "", "", "find tweets by a certain language (e.g. en, es, fr)")
+	rootCmd.Flags().StringVarP(&near, "near", "", "", "find tweets nearby a certain location (e.g. tokyo)")
 	rootCmd.Flags().StringVarP(&out, "out", "o", "", "output csv filename (required)")
 	rootCmd.Flags().StringVarP(&text, "query", "q", "", "query text to search")
 	rootCmd.Flags().StringVarP(&since, "since", "", "", "find tweets since a certain day (e.g. 2014-07-21)")
@@ -110,6 +115,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&until, "until", "", "", "find tweets until a certain day (e.g. 2020-09-06)")
 	rootCmd.Flags().StringVarP(&url, "url", "", "", "find tweets containing a certain url (e.g. www.example.com)")
 	rootCmd.Flags().StringVarP(&userAgent, "user-agent", "", "", "set custom user-agent")
+	rootCmd.Flags().StringVarP(&within, "within", "", "", "find tweets nearby a certain location (e.g. 1km)")
 	rootCmd.MarkFlagRequired("out")
 }
 

@@ -33,6 +33,8 @@ func TestEncode(t *testing.T) {
 		includes []string
 		excludes []string
 		geocode  string
+		near     string
+		within   string
 		url      string
 		expected string
 	}{
@@ -47,6 +49,8 @@ func TestEncode(t *testing.T) {
 			includes: []string{},
 			excludes: []string{},
 			geocode:  "",
+			near:     "",
+			within:   "",
 			url:      "",
 			expected: "",
 		},
@@ -61,8 +65,10 @@ func TestEncode(t *testing.T) {
 			includes: []string{"retweets", "nativeretweets"},
 			excludes: []string{"replies", "hashtags"},
 			geocode:  "35.6851508,139.7526768,0.1km",
+			near:     "tokyo",
+			within:   "0.1km",
 			url:      "www.example.com",
-			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja filter:verified filter:links include:retweets include:nativeretweets exclude:replies exclude:hashtags geocode:35.6851508,139.7526768,0.1km url:www.example.com",
+			expected: "foo bar since:2020-09-06 until:2020-09-07 from:foo to:bar lang:ja filter:verified filter:links include:retweets include:nativeretweets exclude:replies exclude:hashtags geocode:35.6851508,139.7526768,0.1km near:tokyo within:0.1km url:www.example.com",
 		},
 	}
 
@@ -79,6 +85,8 @@ func TestEncode(t *testing.T) {
 				Includes: e.includes,
 				Excludes: e.excludes,
 				Geocode:  e.geocode,
+				Near:     e.near,
+				Within:   e.within,
 				Url:      e.url,
 			}
 
@@ -104,6 +112,8 @@ func TestIsEmpty(t *testing.T) {
 		includes []string
 		excludes []string
 		geocode  string
+		near     string
+		within   string
 		url      string
 		expected bool
 	}{
@@ -118,6 +128,8 @@ func TestIsEmpty(t *testing.T) {
 			includes: []string{},
 			excludes: []string{},
 			geocode:  "",
+			near:     "",
+			within:   "",
 			url:      "",
 			expected: true,
 		},
@@ -132,6 +144,8 @@ func TestIsEmpty(t *testing.T) {
 			includes: []string{"retweets", "nativeretweets"},
 			excludes: []string{"replies", "hashtags"},
 			geocode:  "35.6851508,139.7526768,0.1km",
+			near:     "tokyo",
+			within:   "0.1km",
 			url:      "www.example.com",
 			expected: false,
 		},
@@ -150,6 +164,8 @@ func TestIsEmpty(t *testing.T) {
 				Includes: e.includes,
 				Excludes: e.excludes,
 				Geocode:  e.geocode,
+				Near:     e.near,
+				Within:   e.within,
 				Url:      e.url,
 			}
 
