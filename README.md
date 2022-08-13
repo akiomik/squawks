@@ -6,6 +6,10 @@ get-old-tweets
 
 A cli tool to get old tweets on twitter (inspired by [Jefferson-Henrique/GetOldTweets-python](https://github.com/Jefferson-Henrique/GetOldTweets-python)).
 
+- Download your search results to a csv file
+- No authentication required
+- Works out-of-the-box
+
 ## Install
 
 - Download the latest release from [the release page](https://github.com/akiomik/get-old-tweets/releases/latest). Supported platforms are Windows, macOS and linux.
