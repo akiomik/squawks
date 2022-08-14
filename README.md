@@ -17,16 +17,18 @@ A cli tool to get old tweets on twitter (inspired by [Jefferson-Henrique/GetOldT
 
 ## Usage
 
+### Search for tweets
+
 ```
 Usage:
-  squawks --out FILENAME [flags]
+  squawks search tweets --out FILENAME [flags]
 
 Flags:
       --exclude strings     exclude tweets by type of tweet [hashtags|nativeretweets|retweets|replies] (default [])
       --filter strings      find tweets by type of account or tweet [verified|follows|media|images|twimg|videos|periscope|vine|consumer_video|pro_video|native_video|links|hashtags|nativeretweets|retweets|replies|safe|news] (default [])
       --from string         find tweets sent from a certain user
       --geocode string      find tweets sent from certain coordinates (e.g. 35.6851508,139.7526768,0.1km)
-  -h, --help                help for squawks
+  -h, --help                help for tweets
       --include strings     include tweets by type of tweet [hashtags|nativeretweets|retweets|replies] (default [])
       --lang string         find tweets by a certain language (e.g. en, es, fr)
       --near string         find tweets nearby a certain location (e.g. tokyo)
@@ -38,7 +40,6 @@ Flags:
       --until string        find tweets until a certain day (e.g. 2020-09-06)
       --url string          find tweets containing a certain url (e.g. www.example.com)
       --user-agent string   set custom user-agent
-  -v, --version             version for squawks
       --within string       find tweets nearby a certain location (e.g. 1km)
 ```
 

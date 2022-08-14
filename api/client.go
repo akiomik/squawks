@@ -17,8 +17,8 @@ package api
 import (
 	"github.com/go-resty/resty/v2"
 
-	"github.com/akiomik/squawks/config"
 	"github.com/akiomik/squawks/api/json"
+	"github.com/akiomik/squawks/config"
 )
 
 type Client struct {

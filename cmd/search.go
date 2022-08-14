@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package cmd
 
 import (
-	"fmt"
-	"os"
+	"github.com/spf13/cobra"
 
-	"github.com/akiomik/squawks/cmd"
+	"github.com/akiomik/squawks/cmd/search"
 )
 
-func main() {
-	rootCmd := cmd.NewRootCommand()
-	err := rootCmd.Execute()
-
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err.Error())
-		os.Exit(1)
+func NewSearchCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "search <command>",
+		Short: "Search for something",
 	}
+
+	cmd.AddCommand(search.NewTweetsCommand())
+
+	return cmd
 }
