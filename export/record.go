@@ -20,7 +20,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/akiomik/squawks/twitter/json"
+	"github.com/akiomik/squawks/api/json"
 )
 
 type Record struct {

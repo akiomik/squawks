@@ -20,7 +20,7 @@ import (
 
 	"github.com/akiomik/squawks/config"
 	"github.com/akiomik/squawks/export"
-	"github.com/akiomik/squawks/twitter"
+	"github.com/akiomik/squawks/api"
 	"github.com/spf13/cobra"
 )
 
@@ -48,7 +48,7 @@ var rootCmd = &cobra.Command{
 	Short:   "squawks v" + config.Version,
 	Version: config.Version,
 	Run: func(cmd *cobra.Command, args []string) {
-		q := twitter.Query{
+		q := api.Query{
 			Text:     text,
 			Since:    since,
 			Until:    until,
@@ -75,7 +75,7 @@ var rootCmd = &cobra.Command{
 		}
 		defer f.Close()
 
-		client := twitter.NewClient()
+		client := api.NewClient()
 		if len(userAgent) > 0 {
 			client.UserAgent = userAgent
 		}
@@ -84,7 +84,7 @@ var rootCmd = &cobra.Command{
 		go func() {
 			defer close(ch)
 
-			opts := twitter.SearchOptions{Query: q, Top: top}
+			opts := api.SearchOptions{Query: q, Top: top}
 			for res := range client.SearchAll(opts) {
 				if res.Error != nil {
 					fmt.Fprintln(os.Stderr, "Error: %w", res.Error)

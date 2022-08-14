@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package twitter
+package api
 
 import (
 	"github.com/go-resty/resty/v2"
 
 	"github.com/akiomik/squawks/config"
-	"github.com/akiomik/squawks/twitter/json"
+	"github.com/akiomik/squawks/api/json"
 )
 
 type Client struct {

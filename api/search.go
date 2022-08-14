@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package twitter
+package api
 
 import (
 	"fmt"
 
-	"github.com/akiomik/squawks/twitter/json"
+	"github.com/akiomik/squawks/api/json"
 )
 
 type SearchOptions struct {

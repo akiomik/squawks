@@ -15,7 +15,7 @@
 //go:build small
 // +build small
 
-package twitter
+package api
 
 import (
 	"testing"

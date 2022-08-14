@@ -15,7 +15,7 @@
 //go:build small
 // +build small
 
-package twitter
+package api
 
 import (
 	"errors"
@@ -24,7 +24,7 @@ import (
 
 	"github.com/jarcoal/httpmock"
 
-	"github.com/akiomik/squawks/twitter/json"
+	"github.com/akiomik/squawks/api/json"
 )
 
 func TestSearch(t *testing.T) {
