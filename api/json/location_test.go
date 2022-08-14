@@ -19,6 +19,8 @@ package json
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLatLongString(t *testing.T) {
@@ -39,9 +41,7 @@ func TestLatLongString(t *testing.T) {
 	for name, e := range examples {
 		t.Run(name, func(t *testing.T) {
 			actual := e.coordinate.String()
-			if actual != e.expected {
-				t.Errorf(`Expect "%s", got "%s"`, e.expected, actual)
-			}
+			assert.Equal(t, e.expected, actual)
 		})
 	}
 }
@@ -64,9 +64,7 @@ func TestLongLatString(t *testing.T) {
 	for name, e := range examples {
 		t.Run(name, func(t *testing.T) {
 			actual := e.coordinate.String()
-			if actual != e.expected {
-				t.Errorf(`Expect "%s", got "%s"`, e.expected, actual)
-			}
+			assert.Equal(t, e.expected, actual)
 		})
 	}
 }

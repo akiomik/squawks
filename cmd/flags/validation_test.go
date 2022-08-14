@@ -19,58 +19,58 @@ package flags
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/spf13/pflag"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStringSliceWithValidationVarP(t *testing.T) {
 	examples := map[string]struct {
 		input    []string
 		expected []string
-		error    string
+		msg      string
 	}{
 		"none": {
 			input:    []string{},
 			expected: []string{},
-			error:    "",
+			msg:      "",
 		},
 		"empty": {
 			input:    []string{"--arg="},
 			expected: []string{},
-			error:    "",
+			msg:      "",
 		},
 		"valid-single": {
 			input:    []string{"--arg=foo"},
 			expected: []string{"foo"},
-			error:    "",
+			msg:      "",
 		},
 		"invalid-single": {
 			input:    []string{"--arg=bar"},
 			expected: []string{},
-			error:    `invalid argument "bar" for "--arg" flag: string starting with "foo" are supported`,
+			msg:      `invalid argument "bar" for "--arg" flag: string starting with "foo" are supported`,
 		},
 		"valid-multiple-flags": {
 			input:    []string{"--arg=foo", "--arg=foobar"},
 			expected: []string{"foo|foobar"},
-			error:    "",
+			msg:      "",
 		},
 		"invalid-multiple-flags": {
 			input:    []string{"--arg=foo", "--arg=bar"},
 			expected: []string{"foo"},
-			error:    `invalid argument "bar" for "--arg" flag: string starting with "foo" are supported`,
+			msg:      `invalid argument "bar" for "--arg" flag: string starting with "foo" are supported`,
 		},
 		"valid-multiple-values": {
 			input:    []string{"--arg=foo,foobar"},
 			expected: []string{"foo|foobar"},
-			error:    "",
+			msg:      "",
 		},
 		"invalid-multiple-values": {
 			input:    []string{"--arg=foo,bar"},
 			expected: []string{},
-			error:    `invalid argument "foo,bar" for "--arg" flag: string starting with "foo" are supported`,
+			msg:      `invalid argument "foo,bar" for "--arg" flag: string starting with "foo" are supported`,
 		},
 	}
 
@@ -91,28 +91,15 @@ func TestStringSliceWithValidationVarP(t *testing.T) {
 			StringSliceWithValidationVarP(flags, &args, "arg", "", []string{}, "args for testing", validator)
 			err := flags.Parse(e.input)
 
-			if err == nil {
-				if e.error != "" {
-					t.Errorf(`Expect error %v, got nil`, e.error)
-					return
-				}
+			if len(e.msg) == 0 {
+				assert.NoError(t, err)
 			} else {
-				if e.error != err.Error() {
-					t.Errorf(`Expect "%s", got "%v"`, e.error, err)
-					return
-				}
+				assert.EqualError(t, err, e.msg)
 			}
 
 			actual, err := flags.GetStringSlice("arg")
-			if err != nil {
-				t.Errorf(`Expect no error, got "%v"`, err)
-				return
-			}
-
-			if !reflect.DeepEqual(actual, e.expected) {
-				t.Errorf("Expect %v, got %v", e.expected, actual)
-				return
-			}
+			assert.NoError(t, err)
+			assert.Equal(t, e.expected, actual)
 		})
 	}
 }

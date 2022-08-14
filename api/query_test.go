@@ -19,6 +19,8 @@ package api
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEncode(t *testing.T) {
@@ -91,11 +93,7 @@ func TestEncode(t *testing.T) {
 			}
 
 			actual := q.Encode()
-
-			if actual != e.expected {
-				t.Errorf(`Expect "%s", got "%s"`, e.expected, actual)
-				return
-			}
+			assert.Equal(t, e.expected, actual)
 		})
 	}
 }
@@ -170,11 +168,7 @@ func TestIsEmpty(t *testing.T) {
 			}
 
 			actual := q.IsEmpty()
-
-			if actual != e.expected {
-				t.Errorf("Expect %v, got %v", e.expected, actual)
-				return
-			}
+			assert.Equal(t, e.expected, actual)
 		})
 	}
 }

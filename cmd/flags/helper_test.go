@@ -20,6 +20,8 @@ package flags
 import (
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAll(t *testing.T) {
@@ -48,10 +50,7 @@ func TestAll(t *testing.T) {
 	for name, e := range examples {
 		t.Run(name, func(t *testing.T) {
 			actual := All(e.xs, e.f)
-			if actual != e.expected {
-				t.Errorf("Expect %v, got %v", e.expected, actual)
-				return
-			}
+			assert.Equal(t, e.expected, actual)
 		})
 	}
 }
@@ -82,10 +81,7 @@ func TestAny(t *testing.T) {
 	for name, e := range examples {
 		t.Run(name, func(t *testing.T) {
 			actual := Any(e.xs, e.f)
-			if actual != e.expected {
-				t.Errorf("Expect %v, got %v", e.expected, actual)
-				return
-			}
+			assert.Equal(t, e.expected, actual)
 		})
 	}
 }
@@ -116,10 +112,7 @@ func TestIncludes(t *testing.T) {
 	for name, e := range examples {
 		t.Run(name, func(t *testing.T) {
 			actual := Includes(e.xs, e.n)
-			if actual != e.expected {
-				t.Errorf("Expect %v, got %v", e.expected, actual)
-				return
-			}
+			assert.Equal(t, e.expected, actual)
 		})
 	}
 }

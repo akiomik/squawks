@@ -18,9 +18,10 @@
 package export
 
 import (
-	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/akiomik/squawks/api/json"
 )
@@ -34,10 +35,7 @@ func TestReverseSortedTweetIdsWhenInstructionsAreEmpty(t *testing.T) {
 
 	expected := []string{}
 	actual := ReverseSortedTweetIds(j)
-	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("Expect %v, got %v", expected, actual)
-		return
-	}
+	assert.Equal(t, expected, actual)
 }
 
 func TestReverseSortedTweetIdsWhenInstructionsAreNotEmpty(t *testing.T) {
@@ -120,10 +118,7 @@ func TestReverseSortedTweetIdsWhenInstructionsAreNotEmpty(t *testing.T) {
 
 	expected := []string{"300", "100", "200"}
 	actual := ReverseSortedTweetIds(j)
-	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("Expect %v, got %v", expected, actual)
-		return
-	}
+	assert.Equal(t, expected, actual)
 }
 
 func TestNewRecordsFromAdaptive(t *testing.T) {
@@ -242,8 +237,5 @@ func TestNewRecordsFromAdaptive(t *testing.T) {
 	}
 
 	actual := NewRecordsFromAdaptive(&j)
-	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("Expect %+v, got %+v", expected, actual)
-		return
-	}
+	assert.Equal(t, expected, actual)
 }

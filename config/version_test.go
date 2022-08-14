@@ -20,12 +20,12 @@ package config
 import (
 	"regexp"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestVersion(t *testing.T) {
 	// from https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
 	r := regexp.MustCompile(`^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`)
-	if !r.MatchString(Version) {
-		t.Errorf("Expect to match semver, but it does not")
-	}
+	assert.Regexp(t, r, Version)
 }

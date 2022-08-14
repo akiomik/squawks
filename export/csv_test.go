@@ -21,17 +21,15 @@ import (
 	"encoding/csv"
 	"io"
 	"os"
-	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestExportCsvEmpty(t *testing.T) {
 	f, err := os.CreateTemp(os.TempDir(), "squawks-test-export-csv-empty-")
-	if err != nil {
-		t.Errorf("Failed to create tempfile: %v", err)
-		return
-	}
+	assert.NoError(t, err)
 	defer f.Close()
 
 	ch := make(chan []Record)
@@ -43,18 +41,12 @@ func TestExportCsvEmpty(t *testing.T) {
 
 	reader := csv.NewReader(f)
 	_, err = reader.Read()
-	if err != io.EOF {
-		t.Errorf("Expect to create an empty csv file, got %v", err)
-		return
-	}
+	assert.ErrorIs(t, err, io.EOF)
 }
 
 func TestExportCsvNonEmpty(t *testing.T) {
 	f, err := os.CreateTemp(os.TempDir(), "squawks-test-export-csv-non-empty-")
-	if err != nil {
-		t.Errorf("Failed to create tempfile: %v", err)
-		return
-	}
+	assert.NoError(t, err)
 	defer f.Close()
 
 	ch := make(chan []Record)
@@ -123,16 +115,10 @@ func TestExportCsvNonEmpty(t *testing.T) {
 
 	reader := csv.NewReader(f)
 	actualHeader, err := reader.Read()
-	if err != nil {
-		t.Errorf("Failed to read csv: %v", err)
-		return
-	}
+	assert.NoError(t, err)
 
 	expectedHeader := []string{"id", "username", "created_at", "full_text", "retweet_count", "favorite_count", "reply_count", "quote_count", "latitude", "longitude", "lang", "source"}
-	if !reflect.DeepEqual(actualHeader, expectedHeader) {
-		t.Errorf("Expect to write %v as a header, got %v", expectedHeader, actualHeader)
-		return
-	}
+	assert.Equal(t, expectedHeader, actualHeader)
 
 	expectedRecords := [][]string{
 		[]string{"1000", "watson1", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "3000", "4000", "5000", "6000", "", "", "en", ""},
@@ -141,22 +127,12 @@ func TestExportCsvNonEmpty(t *testing.T) {
 		[]string{"1", "watson4", "2020-09-06T00:01:02+00:00", "To Sherlock Holmes she is always the woman.", "3", "4", "5", "6", "", "", "en", ""},
 	}
 
-	for i, expectedRecord := range expectedRecords {
+	for _, expectedRecord := range expectedRecords {
 		actualRecord, err := reader.Read()
-		if err != nil {
-			t.Errorf("Failed to read csv: %v", err)
-			return
-		}
-
-		if !reflect.DeepEqual(actualRecord, expectedRecord) {
-			t.Errorf("Expect to write %v as a record #%d, got %v", expectedRecord, i, actualRecord)
-			return
-		}
+		assert.NoError(t, err)
+		assert.Equal(t, expectedRecord, actualRecord)
 	}
 
 	_, err = reader.Read()
-	if err != io.EOF {
-		t.Errorf("Expect to reach EOF, got not EOF %v", err)
-		return
-	}
+	assert.ErrorIs(t, err, io.EOF)
 }

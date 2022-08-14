@@ -19,6 +19,8 @@ package json
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -67,15 +69,8 @@ func TestFindCursorWhenReplaceEntryExists(t *testing.T) {
 
 	expected := "scroll:foobar"
 	actual, err := j.FindCursor()
-	if err != nil {
-		t.Errorf("Expect nil, got %v", err)
-		return
-	}
-
-	if actual != expected {
-		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
-		return
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, expected, actual)
 }
 
 func TestFindCursorWhenAddEntriesExist(t *testing.T) {
@@ -96,23 +91,13 @@ func TestFindCursorWhenAddEntriesExist(t *testing.T) {
 
 	expected := "scroll:foobar"
 	actual, err := j.FindCursor()
-	if err != nil {
-		t.Errorf("Expect nil, got %v", err)
-		return
-	}
-
-	if actual != expected {
-		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
-		return
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, expected, actual)
 }
 
 func TestFindCursorWhenNoCursorFound(t *testing.T) {
 	j := Adaptive{}
 
 	_, err := j.FindCursor()
-	if err == nil {
-		t.Errorf("Expect error object, got nil")
-		return
-	}
+	assert.Error(t, err)
 }

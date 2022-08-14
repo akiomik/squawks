@@ -20,14 +20,13 @@ package export
 import (
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestString(t *testing.T) {
 	d := Iso8601Date(time.Date(2013, 8, 19, 2, 4, 28, 0, time.UTC))
 	expected := "2013-08-19T02:04:28+00:00"
 	actual := d.String()
-	if actual != expected {
-		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
-		return
-	}
+	assert.Equal(t, expected, actual)
 }

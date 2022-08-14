@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/akiomik/squawks/config"
 )
@@ -37,16 +38,8 @@ func NewJsonResponse(code int, body string) func(req *http.Request) (*http.Respo
 func TestNewClient(t *testing.T) {
 	c := NewClient()
 
-	expectedUserAgent := "squawks/" + config.Version
-	if c.UserAgent != expectedUserAgent {
-		t.Errorf(`Expect "%s", got "%s"`, expectedUserAgent, c.UserAgent)
-		return
-	}
-
-	if len(c.AuthToken) == 0 {
-		t.Errorf(`Expect not "", got ""`)
-		return
-	}
+	assert.Equal(t, "squawks/"+config.Version, c.UserAgent)
+	assert.NotEmpty(t, c.AuthToken)
 }
 
 func TestRequest(t *testing.T) {
@@ -59,33 +52,28 @@ func TestRequest(t *testing.T) {
 	c.AuthToken = expectedAuthToken
 	client := c.Request()
 
-	if client.Header.Get("User-Agent") != expectedUserAgent {
-		t.Errorf("Expect %v, got %v", expectedUserAgent, client.Header.Get("User-Agent"))
-	}
-
-	if client.Token != expectedAuthToken {
-		t.Errorf("Expect %v, got %v", expectedAuthToken, client.Token)
-	}
+	assert.Equal(t, expectedUserAgent, client.Header.Get("User-Agent"))
+	assert.Equal(t, expectedAuthToken, client.Token)
 }
 
 func TestGetGuestToken(t *testing.T) {
 	examples := map[string]struct {
-		statusCode int
-		response   string
-		expected   string
-		errored    bool
+		statusCode  int
+		response    string
+		expected    string
+		expectError bool
 	}{
 		"success": {
-			statusCode: 200,
-			response:   `{ "guest_token": "deadbeef" }`,
-			expected:   "deadbeef",
-			errored:    false,
+			statusCode:  200,
+			response:    `{ "guest_token": "deadbeef" }`,
+			expected:    "deadbeef",
+			expectError: false,
 		},
 		"failure": {
-			statusCode: 403,
-			response:   `{ "errors": [{ "code": 200, "message": "forbidden" }] }`,
-			expected:   "",
-			errored:    true,
+			statusCode:  403,
+			response:    `{ "errors": [{ "code": 200, "message": "forbidden" }] }`,
+			expected:    "",
+			expectError: true,
 		},
 	}
 
@@ -100,23 +88,18 @@ func TestGetGuestToken(t *testing.T) {
 			httpmock.RegisterResponder("POST", url, NewJsonResponse(e.statusCode, e.response))
 
 			actual, err := c.GetGuestToken()
-			if e.errored != (err != nil) {
-				t.Errorf("Expect error %v, got %v", e.errored, err)
-				return
+			if e.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
 			}
 
-			if actual != e.expected {
-				t.Errorf(`Expect "%s", got "%s"`, e.expected, actual)
-				return
-			}
+			assert.Equal(t, e.expected, actual)
 
 			httpmock.GetTotalCallCount()
 			info := httpmock.GetCallCountInfo()
 
-			if info["POST "+url] != 1 {
-				t.Errorf("The request POST %s was expected to execute once, but it executed %d time(s)", url, info["POST "+url])
-				return
-			}
+			assert.Equal(t, 1, info["POST "+url])
 		})
 	}
 }

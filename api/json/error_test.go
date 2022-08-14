@@ -19,10 +19,12 @@ package json
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestError(t *testing.T) {
-	err := ErrorResponse{
+	actual := &ErrorResponse{
 		Errors: []Error{
 			Error{Code: 200, Message: "forbidden"},
 			Error{Code: 400, Message: "something went wrong"},
@@ -30,8 +32,5 @@ func TestError(t *testing.T) {
 	}
 
 	expected := "200: forbidden\n400: something went wrong"
-	actual := err.Error()
-	if actual != expected {
-		t.Errorf(`Expect "%s", got "%s"`, expected, actual)
-	}
+	assert.EqualError(t, actual, expected)
 }

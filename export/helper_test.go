@@ -18,8 +18,9 @@
 package export
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFilter(t *testing.T) {
@@ -53,10 +54,7 @@ func TestFilter(t *testing.T) {
 	for name, e := range examples {
 		t.Run(name, func(t *testing.T) {
 			actual := Filter(e.input, e.f)
-			if !reflect.DeepEqual(actual, e.expected) {
-				t.Errorf("Expect %v, got %v", e.expected, actual)
-				return
-			}
+			assert.Equal(t, e.expected, actual)
 		})
 	}
 }
@@ -87,10 +85,7 @@ func TestMap(t *testing.T) {
 	for name, e := range examples {
 		t.Run(name, func(t *testing.T) {
 			actual := Map(e.input, e.f)
-			if !reflect.DeepEqual(actual, e.expected) {
-				t.Errorf("Expect %v, got %v", e.expected, actual)
-				return
-			}
+			assert.Equal(t, e.expected, actual)
 		})
 	}
 }
