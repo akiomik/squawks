@@ -24,7 +24,7 @@ import (
 
 	"github.com/jarcoal/httpmock"
 
-	"github.com/akiomik/get-old-tweets/twitter/json"
+	"github.com/akiomik/squawks/twitter/json"
 )
 
 func TestSearch(t *testing.T) {

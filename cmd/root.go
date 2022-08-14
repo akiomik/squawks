@@ -18,9 +18,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/akiomik/get-old-tweets/config"
-	"github.com/akiomik/get-old-tweets/export"
-	"github.com/akiomik/get-old-tweets/twitter"
+	"github.com/akiomik/squawks/config"
+	"github.com/akiomik/squawks/export"
+	"github.com/akiomik/squawks/twitter"
 	"github.com/spf13/cobra"
 )
 
@@ -44,8 +44,8 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "get-old-tweets --out FILENAME",
-	Short:   "get-old-tweets v" + config.Version,
+	Use:     "squawks --out FILENAME",
+	Short:   "squawks v" + config.Version,
 	Version: config.Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		q := twitter.Query{

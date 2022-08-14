@@ -31,8 +31,8 @@ jobs:
     - name: Get dependencies
       run: |
         # go get -v -t -d ./...
-        mkdir -p /home/runner/go/src/github.com/akiomik/get-old-tweets/
-        cp -R . /home/runner/go/src/github.com/akiomik/get-old-tweets/
+        mkdir -p /home/runner/go/src/github.com/akiomik/squawks/
+        cp -R . /home/runner/go/src/github.com/akiomik/squawks/
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure

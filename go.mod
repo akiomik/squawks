@@ -1,4 +1,4 @@
-module github.com/akiomik/get-old-tweets
+module github.com/akiomik/squawks
 
 go 1.18
 

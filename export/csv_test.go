@@ -27,7 +27,7 @@ import (
 )
 
 func TestExportCsvEmpty(t *testing.T) {
-	f, err := os.CreateTemp(os.TempDir(), "get-old-tweets-test-export-csv-empty-")
+	f, err := os.CreateTemp(os.TempDir(), "squawks-test-export-csv-empty-")
 	if err != nil {
 		t.Errorf("Failed to create tempfile: %v", err)
 		return
@@ -50,7 +50,7 @@ func TestExportCsvEmpty(t *testing.T) {
 }
 
 func TestExportCsvNonEmpty(t *testing.T) {
-	f, err := os.CreateTemp(os.TempDir(), "get-old-tweets-test-export-csv-non-empty-")
+	f, err := os.CreateTemp(os.TempDir(), "squawks-test-export-csv-non-empty-")
 	if err != nil {
 		t.Errorf("Failed to create tempfile: %v", err)
 		return

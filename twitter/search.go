@@ -17,7 +17,7 @@ package twitter
 import (
 	"fmt"
 
-	"github.com/akiomik/get-old-tweets/twitter/json"
+	"github.com/akiomik/squawks/twitter/json"
 )
 
 type SearchOptions struct {

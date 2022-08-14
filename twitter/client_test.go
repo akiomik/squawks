@@ -23,7 +23,7 @@ import (
 
 	"github.com/jarcoal/httpmock"
 
-	"github.com/akiomik/get-old-tweets/config"
+	"github.com/akiomik/squawks/config"
 )
 
 func NewJsonResponse(code int, body string) func(req *http.Request) (*http.Response, error) {
@@ -37,7 +37,7 @@ func NewJsonResponse(code int, body string) func(req *http.Request) (*http.Respo
 func TestNewClient(t *testing.T) {
 	c := NewClient()
 
-	expectedUserAgent := "get-old-tweets/" + config.Version
+	expectedUserAgent := "squawks/" + config.Version
 	if c.UserAgent != expectedUserAgent {
 		t.Errorf(`Expect "%s", got "%s"`, expectedUserAgent, c.UserAgent)
 		return

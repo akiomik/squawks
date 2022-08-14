@@ -1,8 +1,8 @@
-get-old-tweets
+squawks
 ==============
 
-[![Go](https://github.com/akiomik/get-old-tweets/actions/workflows/go.yml/badge.svg)](https://github.com/akiomik/get-old-tweets/actions/workflows/go.yml)
-[![CodeQL](https://github.com/akiomik/get-old-tweets/actions/workflows/codeql.yml/badge.svg)](https://github.com/akiomik/get-old-tweets/actions/workflows/codeql.yml)
+[![Go](https://github.com/akiomik/squawks/actions/workflows/go.yml/badge.svg)](https://github.com/akiomik/squawks/actions/workflows/go.yml)
+[![CodeQL](https://github.com/akiomik/squawks/actions/workflows/codeql.yml/badge.svg)](https://github.com/akiomik/squawks/actions/workflows/codeql.yml)
 
 A cli tool to get old tweets on twitter (inspired by [Jefferson-Henrique/GetOldTweets-python](https://github.com/Jefferson-Henrique/GetOldTweets-python)).
 
@@ -12,21 +12,21 @@ A cli tool to get old tweets on twitter (inspired by [Jefferson-Henrique/GetOldT
 
 ## Install
 
-- Download the latest release from [the release page](https://github.com/akiomik/get-old-tweets/releases/latest). Supported platforms are Windows, macOS and linux.
+- Download the latest release from [the release page](https://github.com/akiomik/squawks/releases/latest). Supported platforms are Windows, macOS and linux.
 - Extract the downloaded `.tar.gz` file.
 
 ## Usage
 
 ```
 Usage:
-  get-old-tweets --out FILENAME [flags]
+  squawks --out FILENAME [flags]
 
 Flags:
       --exclude strings     exclude tweets by type of tweet [hashtags|nativeretweets|retweets|replies] (default [])
       --filter strings      find tweets by type of account or tweet [verified|follows|media|images|twimg|videos|periscope|vine|consumer_video|pro_video|native_video|links|hashtags|nativeretweets|retweets|replies|safe|news] (default [])
       --from string         find tweets sent from a certain user
       --geocode string      find tweets sent from certain coordinates (e.g. 35.6851508,139.7526768,0.1km)
-  -h, --help                help for get-old-tweets
+  -h, --help                help for squawks
       --include strings     include tweets by type of tweet [hashtags|nativeretweets|retweets|replies] (default [])
       --lang string         find tweets by a certain language (e.g. en, es, fr)
       --near string         find tweets nearby a certain location (e.g. tokyo)
@@ -38,7 +38,7 @@ Flags:
       --until string        find tweets until a certain day (e.g. 2020-09-06)
       --url string          find tweets containing a certain url (e.g. www.example.com)
       --user-agent string   set custom user-agent
-  -v, --version             version for get-old-tweets
+  -v, --version             version for squawks
       --within string       find tweets nearby a certain location (e.g. 1km)
 ```
 
@@ -47,25 +47,25 @@ Flags:
 Get tweets by username:
 
 ```sh
-get-old-tweets --from 'barackobama' -o out.csv
+squawks --from 'barackobama' -o out.csv
 ```
 
 Get tweets by query search:
 
 ```sh
-get-old-tweets -q 'europe refugees' -o out.csv
+squawks -q 'europe refugees' -o out.csv
 ```
 
 Get tweets by username and bound dates:
 
 ```sh
-get-old-tweets --from 'barackobama' --since 2015-09-10 --until 2015-09-12 -o out.csv
+squawks --from 'barackobama' --since 2015-09-10 --until 2015-09-12 -o out.csv
 ```
 
 Get top tweets by username:
 
 ```sh
-get-old-tweets --from 'barackobama' --top -o out.csv
+squawks --from 'barackobama' --top -o out.csv
 ```
 
 ## Output CSV schema

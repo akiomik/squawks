@@ -17,8 +17,8 @@ package twitter
 import (
 	"github.com/go-resty/resty/v2"
 
-	"github.com/akiomik/get-old-tweets/config"
-	"github.com/akiomik/get-old-tweets/twitter/json"
+	"github.com/akiomik/squawks/config"
+	"github.com/akiomik/squawks/twitter/json"
 )
 
 type Client struct {
@@ -31,7 +31,7 @@ type Client struct {
 func NewClient() *Client {
 	client := Client{}
 	client.Client = resty.New()
-	client.UserAgent = "get-old-tweets/" + config.Version
+	client.UserAgent = "squawks/" + config.Version
 	client.AuthToken = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 	client.MaxRetryAttempts = 3
 

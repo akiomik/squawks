@@ -15,7 +15,7 @@
 package main
 
 import (
-	"github.com/akiomik/get-old-tweets/cmd"
+	"github.com/akiomik/squawks/cmd"
 )
 
 func main() {

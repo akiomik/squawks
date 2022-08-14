@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/akiomik/get-old-tweets/twitter/json"
+	"github.com/akiomik/squawks/twitter/json"
 )
 
 func TestReverseSortedTweetIdsWhenInstructionsAreEmpty(t *testing.T) {
