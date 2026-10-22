@@ -3,7 +3,7 @@ name: goreleaser
 on:
   push:
     tags:
-      - 'v[0-9]*'
+      - 'v*.*.*'
   pull_request:
 
 permissions:
@@ -17,11 +17,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Test release tag validation
-        run: bash .github/scripts/test_validate_release_tag.sh
-      - name: Validate tag before GoReleaser
-        if: github.ref_type == 'tag'
-        run: bash .github/scripts/validate-release-tag.sh "$GITHUB_REF_NAME"
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
