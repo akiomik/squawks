@@ -7,10 +7,13 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  goreleaser:
+  # Pull requests build a snapshot to check the release config. Only the
+  # tag push publishes, so only that job gets a token that can write.
+  snapshot:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,6 +29,27 @@ jobs:
         with:
           distribution: goreleaser
           version: '~> v2'
-          args: ${{ github.event_name == 'pull_request' && 'release --snapshot --clean' || 'release --clean' }}
+          args: release --snapshot --clean
+
+  goreleaser:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v7.0.0
+        with:
+          go-version-file: .go-version
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v7.3.0
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
