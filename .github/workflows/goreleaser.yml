@@ -28,7 +28,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v7.3.0
         with:
           distribution: goreleaser
-          version: '~> v2'
+          version: v2.19.0
           args: release --snapshot --clean
 
   goreleaser:
@@ -52,7 +52,10 @@ jobs:
         uses: goreleaser/goreleaser-action@v7.3.0
         with:
           distribution: goreleaser
-          version: '~> v2'
+          # The action downloads this GoReleaser at run time, outside the
+          # lockfile, and Dependabot does not update it: bump it by hand,
+          # together with the snapshot job above.
+          version: v2.19.0
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
