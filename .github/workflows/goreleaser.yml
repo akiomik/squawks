@@ -45,7 +45,8 @@ jobs:
         uses: actions/setup-go@v7.0.0
         with:
           go-version-file: .go-version
-          # The release build restores nothing a CI run saved.
+          # No cache: one saved by a CI run on main could carry a poisoned
+          # build into the published release.
           cache: false
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v7.3.0
