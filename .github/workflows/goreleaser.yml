@@ -9,6 +9,13 @@ on:
 permissions:
   contents: read
 
+env:
+  # Both jobs run this GoReleaser, so the snapshot checks the configuration
+  # against the version that releases. The action downloads it at run time,
+  # outside actions.lock, and Dependabot does not update it: bump it by hand.
+  # GoReleaser's releases are immutable, so an exact version fixes the binary.
+  GORELEASER_VERSION: v2.19.0
+
 jobs:
   # Pull requests build a snapshot to check the release config. Only the
   # tag push publishes, so only that job gets a token that can write.
@@ -28,7 +35,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v7.3.0
         with:
           distribution: goreleaser
-          version: v2.19.0
+          version: ${{ env.GORELEASER_VERSION }}
           args: release --snapshot --clean
 
   goreleaser:
@@ -52,10 +59,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v7.3.0
         with:
           distribution: goreleaser
-          # The action downloads this GoReleaser at run time, outside the
-          # lockfile, and Dependabot does not update it: bump it by hand,
-          # together with the snapshot job above.
-          version: v2.19.0
+          version: ${{ env.GORELEASER_VERSION }}
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
