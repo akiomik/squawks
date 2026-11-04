@@ -38,7 +38,4 @@ jobs:
       run: make test
 
     - name: Run staticcheck
-      uses: dominikh/staticcheck-action@v1.3.1
-      with:
-        version: "2026.2.2"
-        install-go: false
+      run: go run honnef.co/go/tools/cmd/staticcheck@v0.8.2 ./... # Staticcheck 2026.2.2
